@@ -1,8 +1,13 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
+using QueRecomiendas.Server.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var ConPel = builder.Configuration.GetConnectionString("ConPel");
+builder.Services.AddDbContextFactory<PeliculasContext>(options => options.UseSqlite(ConPel));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
