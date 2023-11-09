@@ -14,6 +14,7 @@ public class Peliculas
 
 	public int PeliculaId { get; set; }
 
+	[Required(ErrorMessage = "Debe Subir una Imagen")]
 	public byte[]? Imagen { get; set; }
 
 	[Required(ErrorMessage = "El Titulo es un Campo Requerido")]
@@ -22,12 +23,12 @@ public class Peliculas
 	[Required(ErrorMessage = "La Fecha de Estreno es un Campo Requerido")]
 	public DateTime FechaEstreno { get; set; } = DateTime.Today;
 
-	[Required(ErrorMessage = "La Puntuacion es un Campo Requerido")]
-	public int Puntuacion { get; set; }
-
+	[Required(ErrorMessage = "Debe Agregar un Resumen Sobre la Pelicula")]
 	public string? Resena { get; set; }
 
 	public string? Trailer { get; set; }
+
+	public int TipoPeliculaId { get; set; }
 
 	[ForeignKey("PeliculaId")]
 	public ICollection<PeliculasDetalle> peliculaDetalle { get; set; } = new List<PeliculasDetalle>();

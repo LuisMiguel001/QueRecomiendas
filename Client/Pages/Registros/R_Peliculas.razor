@@ -1,0 +1,382 @@
+﻿@page "/Pelicula"
+@page "/Pelicula/{PeliculaId:int}"
+@inject HttpClient httpClient
+
+<EditForm Model="pelicula" OnValidSubmit="Guardar">
+	<DataAnnotationsValidator />
+
+	<div class="container">
+		<div class="card shadow-lg">
+
+			@*Encabezado*@
+			<div class="card-header">
+				<h3 class="card align-items-center">Movies</h3>
+			</div>
+
+			<div class="card-body">
+				@*Buscar*@
+				<div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
+					<div class="input-group mb-3">
+						<span class="input-group-text">Buscar</span>
+						<InputNumber @bind-Value="pelicula.PeliculaId" class="form-control" aria-describedby="buscarButton" />
+						<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
+							<i class="oi oi-magnifying-glass" />
+						</button>
+					</div>
+				</div>
+
+				@*Imagen*@
+				<div class="mb-3">
+					<div class="mb-3">
+						<div class="input-group">
+							<InputFile OnChange="OnChange" class="form-control" accept=".png, .jpg, .jpeg" />
+						</div>
+						<ValidationMessage For="@(() => pelicula.Imagen)" />
+					</div>
+					@if (pelicula.Imagen != null)
+					{
+						<img src="@Convert.ToBase64String(pelicula.Imagen)" alt="Imagen seleccionada" />
+					}
+				</div>
+
+				@*Titulo*@
+				<div class="col-md-15">
+					<div class="input-group">
+						<span class="input-group-text">T&iacutetulo</span>
+						<InputText @bind-Value="pelicula.Titulo" class="form-control"></InputText>
+					</div>
+					<ValidationMessage For="@(() =>pelicula.Titulo)" />
+				</div>
+
+				<br>
+
+				<div class="row">
+					@*Fecha*@
+					<div class="col-md-4">
+						<div Class="form-group">
+							<div class="input-group">
+								<span class="input-group-text">Fecha Lanzamiento</span>
+								<InputDate @bind-Value="pelicula.FechaEstreno" class="form-control"></InputDate>
+								<ValidationMessage For="@(() =>pelicula.FechaEstreno)" />
+							</div>
+						</div>
+					</div>
+
+					@*Trailer*@
+					<div class="col-8">
+						<div Class="form-group">
+							<div class="input-group">
+								<span class="input-group-text">Trailer</span>
+								<input type="url" @bind="pelicula.Trailer" class="form-control" name="Trailer">
+								<ValidationMessage For="@(() =>pelicula.Trailer)" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<br>
+
+				@*Resumen*@
+				<div class="mb-3">
+					<div Class="form-group">
+						<div class="input-group">
+							<span class="input-group-text">Resumen</span>
+							<InputTextArea @bind-Value="pelicula.Resena" class="form-control"></InputTextArea>
+						</div>
+						<ValidationMessage For="@(() => pelicula.Resena)" />
+					</div>
+				</div>
+			</div>
+
+			@*DETALLE*@
+			<fieldset class="border-success border border-1">
+				<div class="card-header">
+					<h3>Informaci&oacuten</h3>
+				</div>
+				<div class="row m-1">
+					@*TipoPelicula*@
+					<div class="col-md-6">
+						<label>G&eacutenero: </label>
+						<InputSelect @bind-Value="detalle.TipoPeliculaId" class="form-select">
+							<option value="@pelicula.TipoPeliculaId" hidden="hidden">[Seleccione]</option>
+							@foreach (var item in TiposPeliculasList)
+							{
+								<option value="@item.TipoPeliculaId">@item.Categoria</option>
+							}
+						</InputSelect>
+						<ValidationMessage For="@(() => detalle.TipoPeliculaId)" />
+					</div>
+
+					@*Boton Agregar*@
+					<div class="col-md-5">
+						<label>Actores</label>
+						<div class="input-group">
+							<InputText @bind-Value="detalle.Actores" class="form-control"></InputText>
+							<button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
+							<ValidationMessage For="@(() => detalle.Actores)" />
+						</div>
+					</div>
+				</div>
+
+				@*Tabla de detalles*@
+				<hr />
+				<table class="table table-bordered table-light m-1">
+					<thead class="thead">
+						<tr class="table">
+							<th>Pelicula ID</th>
+							<th>Categoria</th>
+							<th>Actores</th>
+						</tr>
+					</thead>
+
+					<tbody>
+						@foreach (var item in this.pelicula.peliculaDetalle)
+						{
+							<tr>
+								<td>@item.TipoPeliculaId</td>
+								<td>@ObtenerDescripcion(item.TipoPeliculaId)</td>
+								<td>@item.Actores</td>
+								<td><button type="button" class="btn btn-outline-danger" @onclick=@(() => RemoverDetalle(item))><i class="oi oi-trash" /></button></td>
+							</tr>
+						}
+					</tbody>
+				</table>
+				<hr />
+			</fieldset>
+
+			@*Botones*@
+			<div class="card-footer d-flex justify-content-center">
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo</button>
+					<button type="submit" class="btn btn-outline-success"> <i class="oi oi-document" /> Guardar</button>
+					<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><i class="io io-trash" /> Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	@if (Mensaje.Length > 0)
+	{
+		<label class="text-danger">@Mensaje</label>
+	}
+</EditForm>
+
+@code {
+	[Parameter]
+	public int PeliculaId { get; set; }
+	public Peliculas pelicula { get; set; } = new Peliculas();
+
+	public List<byte[]> imagenes { get; set; } = new List<byte[]>();
+	private const int tamañoMaximoArchivo = 2 * 1024 * 1024;
+	private string claseEncima = string.Empty;
+
+	private string Mensaje = string.Empty;
+
+	void OnDragEnter(DragEventArgs e) => claseEncima = "hover";
+	void OnDragLeave(DragEventArgs e) => claseEncima = string.Empty;
+
+	public int TipoPeliculaSeleccionado { get; set; } = 0;
+	public string PeliculaSeleccionado { get; set; } = string.Empty;
+	public string ValidacionDetalle { get; set; } = string.Empty;
+
+	public PeliculasDetalle detalle { get; set; } = new PeliculasDetalle();
+	public IEnumerable<TipoPeliculas> TiposPeliculasList { get; set; } = Enumerable.Empty<TipoPeliculas>();
+
+	async Task OnChange(InputFileChangeEventArgs e)
+	{
+		var archivo = e.File;
+		var buffer = new byte[archivo.Size];
+
+		await archivo.OpenReadStream().ReadAsync(buffer);
+		pelicula.Imagen = buffer;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		var tipos = await httpClient.GetFromJsonAsync<List<TipoPeliculas>>("api/TipoPeli");
+
+		if (tipos is not null)
+		{
+			TiposPeliculasList = tipos;
+		}
+
+		if (PeliculaId > 0)
+		{
+			this.pelicula.PeliculaId = PeliculaId;
+			await Buscar();
+		}
+	}
+
+	public async Task Buscar()
+	{
+		var peliculaEncotrado = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{pelicula.PeliculaId}");
+
+		if (peliculaEncotrado != null)
+		{
+			this.pelicula = peliculaEncotrado;
+			StateHasChanged();
+		}
+		else
+		{
+			//notificationService.ShowNotification(
+			//		titulo: "Error de búsqueda",
+			//		mensaje: "Registro no encontrado",
+			//		NotificationSeverity.Error
+			//);
+		}
+	}
+
+	public async Task Guardar()
+	{
+		if (Validar())
+		{
+			using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
+
+			if (response.IsSuccessStatusCode)
+			{
+				var peliculaDevuelta = await response.Content.ReadFromJsonAsync<Peliculas>();
+
+				if (peliculaDevuelta is not null)
+				{
+					this.pelicula = peliculaDevuelta;
+					Nuevo();
+					//notificationService.ShowNotification(
+					//	titulo: "Exito",
+					//	mensaje: "Registro guardado",
+					//	NotificationSeverity.Success
+					//);
+				}
+				else
+				{
+					//notificationService.ShowNotification(
+					//	titulo: "error!",
+					//	mensaje: "El Registro no se guardo",
+					//	NotificationSeverity.Error
+					//);
+				}
+			}
+			else
+			{
+				//notificationService.ShowNotification(
+				//	titulo: "error!",
+				//	mensaje: "!Algo salio mal!",
+				//	NotificationSeverity.Error
+				//);
+			}
+		}
+	}
+
+	public void Nuevo()
+	{
+		this.pelicula = new Peliculas();
+		this.detalle = new PeliculasDetalle();
+		Mensaje = string.Empty;
+	}
+
+	public bool Validar()
+	{
+		if (string.IsNullOrEmpty(pelicula.Titulo) || pelicula.PeliculaId < 0)
+		{
+			return false;
+		}
+		if (pelicula.FechaEstreno != DateTime.Today)
+		{
+			//notificationService.ShowNotification(
+			//	titulo: "Aviso!",
+			//	mensaje: "La fecha debe ser la actual",
+			//	NotificationSeverity.Warning
+			//);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	public async Task Eliminar()
+	{
+		using var response = await httpClient.DeleteAsync($"api/Peliculas/{pelicula.PeliculaId}");
+
+		if (Validar())
+		{
+			if (!response.IsSuccessStatusCode)
+			{
+				//notificationService.ShowNotification(
+				//	titulo: "Error!",
+				//	mensaje: "No se pudo eliminar!",
+				//	NotificationSeverity.Error
+				//);
+				return;
+			}
+			else
+			{
+				Nuevo();
+				//notificationService.ShowNotification(
+				//	titulo: "Eliminado",
+				//	mensaje: "Se ha eliminado Correctamente",
+				//	NotificationSeverity.Success
+				//);
+			}
+		}
+	}
+
+	private async Task<TipoPeliculas> BuscarPeliculas(int peliculaId)
+	{
+		var pelicula = await httpClient.GetFromJsonAsync<TipoPeliculas>($"api/TipoPeli/{peliculaId}");
+
+		return pelicula ?? new TipoPeliculas();
+	}
+
+	public bool ValidarDetalle()
+	{
+		//if (detalle.TipoPeliculaId <= 0 || string.IsNullOrEmpty(detalle.Actores))
+		//{
+		//	//notificationService.ShowNotification(
+		//	//	titulo: "Aviso!",
+		//	//	mensaje: "Asegúrese de rellenar todos los campos del detalle!",
+		//	//	NotificationSeverity.Warning
+		//	//);
+		//	return false;
+		//}
+
+		return true;
+	}
+
+	public async Task AgregarDetalle()
+	{
+		if (ValidarDetalle())
+		{
+			var pelicula = await BuscarPeliculas(detalle.TipoPeliculaId);
+			if (pelicula != null)
+			{
+				detalle.PeliculaId = this.pelicula.PeliculaId;
+				this.pelicula.peliculaDetalle.Add(detalle);
+				detalle = new PeliculasDetalle();
+
+				//notificationService.ShowNotification(
+				//	titulo: "Éxito",
+				//	mensaje: "Detalle Agregado",
+				//	NotificationSeverity.Success
+				//);
+			}
+			else
+			{
+				//notificationService.ShowNotification(
+				//	titulo: "Error",
+				//	mensaje: "Tipo de película no válido. Asegúrese de seleccionar un Tipo de Película existente.",
+				//	NotificationSeverity.Error
+				//);
+			}
+		}
+	}
+
+	public string ObtenerDescripcion(int Id)
+	{
+		return TiposPeliculasList.Where(p => p.TipoPeliculaId == Id).FirstOrDefault().Categoria;
+	}
+
+	public void RemoverDetalle(PeliculasDetalle detalle)
+	{
+		pelicula.peliculaDetalle.Remove(detalle);
+	}
+}

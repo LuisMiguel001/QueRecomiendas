@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 
 namespace QueRecomiendas.Shared.Models;
 
-public class PeliculasDetalle
+public class TipoPeliculas
 {
 	[Key]
-	public int PeliculasDetalleId { get; set; }
-
-	public int PeliculaId { get; set; }
 
 	[Required(ErrorMessage = "Debe Elegir un Genero")]
 	public int TipoPeliculaId { get; set; }
 
+	[Required(ErrorMessage = "La  categoria es requerido")]
+	public string? Categoria { get; set; }
+
 	public int Disponible { get; set; }
 
-	[Required(ErrorMessage = "El campo Actores no puede estar vacío")]
+	[Required(ErrorMessage = "El el campo Actores no puede estar vacío")]
 	public string? Actores { get; set; }
 }
