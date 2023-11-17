@@ -15,8 +15,4 @@
     <ProjectReference Include="..\Shared\QueRecomiendas.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pages\Consultas\" />
-  </ItemGroup>
-
 </Project>

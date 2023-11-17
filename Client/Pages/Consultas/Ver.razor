@@ -1,0 +1,56 @@
+﻿@page "/detallepelicula"
+@page "/detallepelicula/{PeliculaId:int}"
+@inject HttpClient httpClient
+
+@if (Pelicula is null)
+{
+	<p>Cargando...</p>
+}
+else
+{
+	<div>
+		<h1>@Pelicula.Titulo</h1>
+
+		<span>
+			<strong>Géneros: Acci&oacute;n</strong> @PeliculaDetalle.TipoPelicula?.Categoria | <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+		</span>
+		<br>
+
+		@if (Pelicula.Imagen != null && Pelicula.Imagen.Length > 0)
+		{
+			var base64Image = Convert.ToBase64String(Pelicula.Imagen);
+			<div style="display: flex; align-items: center;">
+				<img class="imagen-pelicula" src="data:image/png;base64,@base64Image" alt="Imagen de la película" style="width: 225px; height: 315px; margin-right: 20px;" />
+				<iframe width="560" height="315" src="@Pelicula.Trailer" title="Trailer de la película" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+			</div>
+		}
+
+		<div class="detalle-item">
+			<strong>Resumen</strong><br>@Pelicula.Resena
+		</div>
+
+		<div class="detalle-item">
+			<strong>Autores:</strong> @PeliculaDetalle.TipoPelicula?.Actores
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public int PeliculaId { get; set; }
+	private Peliculas Pelicula { get; set; }
+	private PeliculasDetalle PeliculaDetalle { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			Pelicula = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{PeliculaId}");
+			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/TipoPeli/{PeliculaId}");
+		}
+		catch (HttpRequestException e)
+		{
+			Console.WriteLine($"Error al obtener detalles de la película: {e.Message}");
+		}
+	}
+}

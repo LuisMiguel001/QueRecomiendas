@@ -17,7 +17,9 @@ public class PeliculasDetalle
 	[Required(ErrorMessage = "Debe Elegir un Genero")]
 	public int TipoPeliculaId { get; set; }
 
-	public int Disponible { get; set; }
+    public TipoPeliculas TipoPelicula { get; set; }
+
+    public int Disponible { get; set; }
 
 	[Required(ErrorMessage = "El campo Actores no puede estar vacío")]
 	public string? Actores { get; set; }

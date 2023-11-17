@@ -11,7 +11,7 @@ using QueRecomiendas.Server.DAL;
 namespace QueRecomiendas.Server.Migrations
 {
     [DbContext(typeof(PeliculasContext))]
-    [Migration("20231109201141_QueRecomiendas")]
+    [Migration("20231117184449_QueRecomiendas")]
     partial class QueRecomiendas
     {
         /// <inheritdoc />
@@ -59,6 +59,7 @@ namespace QueRecomiendas.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Actores")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Disponible")
@@ -94,7 +95,12 @@ namespace QueRecomiendas.Server.Migrations
                     b.Property<int>("Disponible")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("PeliculasPeliculaId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("TipoPeliculaId");
+
+                    b.HasIndex("PeliculasPeliculaId");
 
                     b.ToTable("TipoPeliculas");
 
@@ -166,8 +172,17 @@ namespace QueRecomiendas.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.TipoPeliculas", b =>
+                {
+                    b.HasOne("QueRecomiendas.Shared.Models.Peliculas", null)
+                        .WithMany("TiposPeliculasList")
+                        .HasForeignKey("PeliculasPeliculaId");
+                });
+
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Peliculas", b =>
                 {
+                    b.Navigation("TiposPeliculasList");
+
                     b.Navigation("peliculaDetalle");
                 });
 #pragma warning restore 612, 618

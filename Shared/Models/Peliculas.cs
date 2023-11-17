@@ -30,6 +30,8 @@ public class Peliculas
 
 	public int TipoPeliculaId { get; set; }
 
-	[ForeignKey("PeliculaId")]
+    public IEnumerable<TipoPeliculas>? TiposPeliculasList { get; set; }
+
+    [ForeignKey("PeliculaId")]
 	public ICollection<PeliculasDetalle> peliculaDetalle { get; set; } = new List<PeliculasDetalle>();
 }

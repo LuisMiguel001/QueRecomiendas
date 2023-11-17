@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueRecomiendas.Server", "Server\QueRecomiendas.Server.csproj", "{AC904FC9-C4FA-4D92-93B5-775D25F36C24}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueRecomiendas.Server", "Server\QueRecomiendas.Server.csproj", "{AC904FC9-C4FA-4D92-93B5-775D25F36C24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueRecomiendas.Client", "Client\QueRecomiendas.Client.csproj", "{74616FBE-9C09-4C91-B86F-4E065859AFE1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueRecomiendas.Client", "Client\QueRecomiendas.Client.csproj", "{74616FBE-9C09-4C91-B86F-4E065859AFE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QueRecomiendas.Shared", "Shared\QueRecomiendas.Shared.csproj", "{ED2CAD9A-D7F3-46B2-92CC-CA37FBBF18E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueRecomiendas.Shared", "Shared\QueRecomiendas.Shared.csproj", "{ED2CAD9A-D7F3-46B2-92CC-CA37FBBF18E7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
