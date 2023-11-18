@@ -93,9 +93,9 @@
 				<div class="card-header">
 					<h3>Informaci&oacuten</h3>
 				</div>
-				<div class="row m-1">
+				<div class="row">
 					@*TipoPelicula*@
-					<div class="col-md-6">
+					<div class="col-md-5">
 						<label>G&eacutenero: </label>
 						<InputSelect @bind-Value="detalle.TipoPeliculaId" class="form-select">
 							<option value="@pelicula.TipoPeliculaId" hidden="hidden">[Seleccione]</option>
@@ -107,13 +107,18 @@
 						<ValidationMessage For="@(() => detalle.TipoPeliculaId)" />
 					</div>
 
-					@*Boton Agregar*@
-					<div class="col-md-5">
-						<label>Actores</label>
+					@*Autores*@
+					<div class="col-md-6">
+						<label>Actores:</label>
 						<div class="input-group">
-							<InputText @bind-Value="detalle.Actores" class="form-control"></InputText>
+							<InputSelect @bind-Value="detalle.Actores" class="form-select">
+								<option value="@pelicula.peliActor" hidden="hidden">[Seleccione]</option>
+								@foreach (var item in actoresList)
+								{
+									<option value="@item.Id">@item.Nombre</option>
+								}
+							</InputSelect>
 							<button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
-							<ValidationMessage For="@(() => detalle.Actores)" />
 						</div>
 					</div>
 				</div>
@@ -140,6 +145,16 @@
 							</tr>
 						}
 					</tbody>
+
+					@*<tbody>
+						@foreach (var item in this.actor.PeliculasActores)
+						{
+							<tr>
+								<td>@ObtenerDescripcionActor(item.Id)</td>
+								<td><button type="button" class="btn btn-outline-danger" @onclick=@(() => RemoverActores(item))><i class="oi oi-trash" /></button></td>
+							</tr>
+						}
+					</tbody>*@
 				</table>
 				<hr />
 			</fieldset>
@@ -177,9 +192,15 @@
 	public int TipoPeliculaSeleccionado { get; set; } = 0;
 	public string PeliculaSeleccionado { get; set; } = string.Empty;
 	public string ValidacionDetalle { get; set; } = string.Empty;
-
+	//peliActor
 	public PeliculasDetalle detalle { get; set; } = new PeliculasDetalle();
 	public IEnumerable<TipoPeliculas> TiposPeliculasList { get; set; } = Enumerable.Empty<TipoPeliculas>();
+	public IEnumerable<Actores> actoresList { get; set; } = Enumerable.Empty<Actores>();
+	public Actores actor { get; set; } = new Actores();
+
+	//public List<int> autoresSeleccionados { get; set; } = new List<int>();
+	public int[] autoresSeleccionados { get; set; } = Array.Empty<int>();
+	//public List<Actores> autoresList { get; set; } = new List<Actores>();
 
 	async Task OnChange(InputFileChangeEventArgs e)
 	{
@@ -193,6 +214,12 @@
 	protected override async Task OnInitializedAsync()
 	{
 		var tipos = await httpClient.GetFromJsonAsync<List<TipoPeliculas>>("api/TipoPeli");
+		var actores = await httpClient.GetFromJsonAsync<List<Actores>>("api/Actores");
+
+		if (actores is not null)
+		{
+			actoresList = actores;
+		}
 
 		if (tipos is not null)
 		{
@@ -205,6 +232,23 @@
 			await Buscar();
 		}
 	}
+
+	//protected override async Task OnInitializedAsync()
+	//{
+	//	var tipos = await httpClient.GetFromJsonAsync<List<TipoPeliculas>>("api/TipoPeli");
+
+	//	if (tipos is not null)
+	//	{
+	//		TiposPeliculasList = tipos;
+	//		await CargarAutores();
+	//	}
+
+	//	if (PeliculaId > 0)
+	//	{
+	//		this.pelicula.PeliculaId = PeliculaId;
+	//		await Buscar();
+	//	}
+	//}
 
 	public async Task Buscar()
 	{
@@ -227,41 +271,40 @@
 
 	public async Task Guardar()
 	{
-		if (Validar())
+
+		using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
+
+		if (response.IsSuccessStatusCode)
 		{
-			using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
+			var peliculaDevuelta = await response.Content.ReadFromJsonAsync<Peliculas>();
 
-			if (response.IsSuccessStatusCode)
+			if (peliculaDevuelta is not null)
 			{
-				var peliculaDevuelta = await response.Content.ReadFromJsonAsync<Peliculas>();
-
-				if (peliculaDevuelta is not null)
-				{
-					this.pelicula = peliculaDevuelta;
-					Nuevo();
-					//notificationService.ShowNotification(
-					//	titulo: "Exito",
-					//	mensaje: "Registro guardado",
-					//	NotificationSeverity.Success
-					//);
-				}
-				else
-				{
-					//notificationService.ShowNotification(
-					//	titulo: "error!",
-					//	mensaje: "El Registro no se guardo",
-					//	NotificationSeverity.Error
-					//);
-				}
+				this.pelicula = peliculaDevuelta;
+				this.pelicula.peliActor = autoresSeleccionados.Select(actorId => new PeliculasActores { ActorId = actorId }).ToList();
+				Nuevo();
+				//notificationService.ShowNotification(
+				//	titulo: "Exito",
+				//	mensaje: "Registro guardado",
+				//	NotificationSeverity.Success
+				//);
 			}
 			else
 			{
 				//notificationService.ShowNotification(
 				//	titulo: "error!",
-				//	mensaje: "!Algo salio mal!",
+				//	mensaje: "El Registro no se guardo",
 				//	NotificationSeverity.Error
 				//);
 			}
+		}
+		else
+		{
+			//notificationService.ShowNotification(
+			//	titulo: "error!",
+			//	mensaje: "!Algo salio mal!",
+			//	NotificationSeverity.Error
+			//);
 		}
 	}
 
@@ -375,8 +418,23 @@
 		return TiposPeliculasList.Where(p => p.TipoPeliculaId == Id).FirstOrDefault().Categoria;
 	}
 
+	//public (string nombre, string foto) ObtenerDescripcionActor(int Id)
+	//{
+	//	var actor = actoresList.FirstOrDefault(a => a.Id == Id);
+
+	//	return (actor.Nombre, actor.Foto);
+	//}
+
 	public void RemoverDetalle(PeliculasDetalle detalle)
 	{
 		pelicula.peliculaDetalle.Remove(detalle);
 	}
+
+	//public void RemoverActores(PeliculasActores actores)
+	//{
+	//	actor.peliculasActores.Remove(actores);
+	//}
 }
+
+
+

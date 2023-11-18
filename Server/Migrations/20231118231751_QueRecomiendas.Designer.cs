@@ -11,7 +11,7 @@ using QueRecomiendas.Server.DAL;
 namespace QueRecomiendas.Server.Migrations
 {
     [DbContext(typeof(PeliculasContext))]
-    [Migration("20231118040716_QueRecomiendas")]
+    [Migration("20231118231751_QueRecomiendas")]
     partial class QueRecomiendas
     {
         /// <inheritdoc />
@@ -19,6 +19,33 @@ namespace QueRecomiendas.Server.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.13");
+
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.Actores", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Biografia")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("FechaNacimiento")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Foto")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Actores");
+                });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Peliculas", b =>
                 {
@@ -50,6 +77,27 @@ namespace QueRecomiendas.Server.Migrations
                     b.HasKey("PeliculaId");
 
                     b.ToTable("Peliculas");
+                });
+
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.PeliculasActores", b =>
+                {
+                    b.Property<int>("ActorPeliId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ActorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PeliculaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ActorPeliId");
+
+                    b.HasIndex("ActorId");
+
+                    b.HasIndex("PeliculaId");
+
+                    b.ToTable("PeliculasActores");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.PeliculasDetalle", b =>
@@ -165,6 +213,25 @@ namespace QueRecomiendas.Server.Migrations
                         });
                 });
 
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.PeliculasActores", b =>
+                {
+                    b.HasOne("QueRecomiendas.Shared.Models.Actores", "Actor")
+                        .WithMany("peliculasActores")
+                        .HasForeignKey("ActorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QueRecomiendas.Shared.Models.Peliculas", "Pelicula")
+                        .WithMany("peliActor")
+                        .HasForeignKey("PeliculaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Actor");
+
+                    b.Navigation("Pelicula");
+                });
+
             modelBuilder.Entity("QueRecomiendas.Shared.Models.PeliculasDetalle", b =>
                 {
                     b.HasOne("QueRecomiendas.Shared.Models.Peliculas", null)
@@ -189,9 +256,16 @@ namespace QueRecomiendas.Server.Migrations
                         .HasForeignKey("PeliculasPeliculaId");
                 });
 
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.Actores", b =>
+                {
+                    b.Navigation("peliculasActores");
+                });
+
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Peliculas", b =>
                 {
                     b.Navigation("TiposPeliculasList");
+
+                    b.Navigation("peliActor");
 
                     b.Navigation("peliculaDetalle");
                 });

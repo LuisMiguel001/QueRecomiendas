@@ -1,0 +1,92 @@
+﻿@page "/crearactor"
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+<h3>Crear Actor</h3>
+
+<EditForm Model="actor" OnValidSubmit="GuardarActor">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <InputText id="nombre" @bind-Value="actor.Nombre" class="form-control" />
+        <ValidationMessage For="@(() => actor.Nombre)" />
+    </div>
+
+    <div class="form-group">
+        <label for="biografia">Biografía:</label>
+        <InputText id="biografia" @bind-Value="actor.Biografia" class="form-control" />
+        <ValidationMessage For="@(() => actor.Biografia)" />
+    </div>
+
+    <div class="form-group">
+        <label for="foto">Foto URL:</label>
+        <InputText id="foto" @bind-Value="actor.Foto" class="form-control" />
+        <ValidationMessage For="@(() => actor.Foto)" />
+    </div>
+
+    <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
+        <InputDate id="fechaNacimiento" @bind-Value="actor.FechaNacimiento" class="form-control" />
+        <ValidationMessage For="@(() => actor.FechaNacimiento)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    private Actores actor = new Actores();
+
+    private async Task GuardarActor()
+    {
+        try
+        {
+            // Aquí debes enviar el actor al servidor para guardarlo en la base de datos
+            // Puedes usar httpClient.PostAsJsonAsync u otro método según tu implementación
+
+            // Primero, verifica si el actor tiene datos válidos antes de enviarlo al servidor
+            if (ValidarDatosActor())
+            {
+                // Realiza la solicitud HTTP para guardar el actor
+                var response = await httpClient.PostAsJsonAsync("api/Actores", actor);
+
+                // Verifica si la operación fue exitosa (código de respuesta 2xx)
+                if (response.IsSuccessStatusCode)
+                {
+                    // Limpiar el formulario o realizar cualquier otra acción necesaria después de guardar
+                    actor = new Actores();
+
+                    // Redirige al usuario a la página de registro de películas
+                    navigationManager.NavigateTo("/pelicula");
+                }
+                else
+                {
+                    // Maneja el caso en que la operación no fue exitosa
+                    // Puedes mostrar un mensaje de error o realizar otras acciones según tus necesidades
+                    // Por ejemplo, puedes extraer el mensaje de error del cuerpo de la respuesta:
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error al guardar el actor: {errorMessage}");
+                }
+            }
+            else
+            {
+                // Maneja el caso en que los datos del actor no son válidos
+                // Puedes mostrar un mensaje de validación o realizar otras acciones según tus necesidades
+                Console.WriteLine("Los datos del actor no son válidos. Por favor, verifica los campos.");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Maneja cualquier excepción que pueda ocurrir durante la operación
+            Console.WriteLine($"Error al intentar guardar el actor: {ex.Message}");
+        }
+    }
+
+    private bool ValidarDatosActor()
+    {
+        // Realiza validaciones adicionales según tus requisitos
+        // Puedes verificar que los campos obligatorios estén llenos, la longitud de las cadenas, etc.
+        // Devuelve true si los datos son válidos, de lo contrario, devuelve false
+        return !string.IsNullOrEmpty(actor.Nombre) && !string.IsNullOrEmpty(actor.Foto);
+    }
+}
