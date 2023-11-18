@@ -2,6 +2,30 @@
 @page "/detallepelicula/{PeliculaId:int}"
 @inject HttpClient httpClient
 
+<style>
+	p.clasificacion {
+		position: relative;
+		overflow: hidden;
+		display: inline-block;
+	}
+
+		p.clasificacion input {
+			position: absolute;
+			top: -100px;
+		}
+
+		p.clasificacion label {
+			float: right;
+			color: #333;
+		}
+
+			p.clasificacion label:hover,
+			p.clasificacion label:hover ~ label,
+			p.clasificacion input:checked ~ label {
+				color: #dd4;
+			}
+</style>
+
 @if (Pelicula is null)
 {
 	<p>Cargando...</p>
@@ -12,8 +36,9 @@ else
 		<h1>@Pelicula.Titulo</h1>
 
 		<span>
-			<strong>Géneros: Acci&oacute;n</strong> @PeliculaDetalle.TipoPelicula?.Categoria | <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+			<strong>Géneros:</strong> Acci&oacute;n @PeliculaDetalle.TipoPelicula?.Categoria | <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
 		</span>
+
 		<br>
 
 		@if (Pelicula.Imagen != null && Pelicula.Imagen.Length > 0)
@@ -21,9 +46,24 @@ else
 			var base64Image = Convert.ToBase64String(Pelicula.Imagen);
 			<div style="display: flex; align-items: center;">
 				<img class="imagen-pelicula" src="data:image/png;base64,@base64Image" alt="Imagen de la película" style="width: 225px; height: 315px; margin-right: 20px;" />
-				<iframe width="560" height="315" src="@Pelicula.Trailer" title="Trailer de la película" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe width="560" height="315" src="@($"https://www.youtube.com/embed/{Pelicula.Trailer}")" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 			</div>
 		}
+		<span>
+			<p class="clasificacion">
+				<strong>Tu voto: </strong>
+				<input id="radio1" type="radio" name="estrellas" value="5">
+				<label for="radio1">★</label>
+				<input id="radio2" type="radio" name="estrellas" value="4">
+				<label for="radio2">★</label>
+				<input id="radio3" type="radio" name="estrellas" value="3">
+				<label for="radio3">★</label>
+				<input id="radio4" type="radio" name="estrellas" value="2">
+				<label for="radio4">★</label>
+				<input id="radio5" type="radio" name="estrellas" value="1">
+				<label for="radio5">★</label>
+			</p>
+		</span>
 
 		<div class="detalle-item">
 			<strong>Resumen</strong><br>@Pelicula.Resena

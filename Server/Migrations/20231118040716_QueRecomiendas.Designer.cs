@@ -11,7 +11,7 @@ using QueRecomiendas.Server.DAL;
 namespace QueRecomiendas.Server.Migrations
 {
     [DbContext(typeof(PeliculasContext))]
-    [Migration("20231117184449_QueRecomiendas")]
+    [Migration("20231118040716_QueRecomiendas")]
     partial class QueRecomiendas
     {
         /// <inheritdoc />
@@ -74,6 +74,8 @@ namespace QueRecomiendas.Server.Migrations
                     b.HasKey("PeliculasDetalleId");
 
                     b.HasIndex("PeliculaId");
+
+                    b.HasIndex("TipoPeliculaId");
 
                     b.ToTable("PeliculaDetalle");
                 });
@@ -170,6 +172,14 @@ namespace QueRecomiendas.Server.Migrations
                         .HasForeignKey("PeliculaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("QueRecomiendas.Shared.Models.TipoPeliculas", "TipoPelicula")
+                        .WithMany()
+                        .HasForeignKey("TipoPeliculaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TipoPelicula");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.TipoPeliculas", b =>

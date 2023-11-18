@@ -72,6 +72,8 @@ namespace QueRecomiendas.Server.Migrations
 
                     b.HasIndex("PeliculaId");
 
+                    b.HasIndex("TipoPeliculaId");
+
                     b.ToTable("PeliculaDetalle");
                 });
 
@@ -167,6 +169,14 @@ namespace QueRecomiendas.Server.Migrations
                         .HasForeignKey("PeliculaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("QueRecomiendas.Shared.Models.TipoPeliculas", "TipoPelicula")
+                        .WithMany()
+                        .HasForeignKey("TipoPeliculaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TipoPelicula");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.TipoPeliculas", b =>
