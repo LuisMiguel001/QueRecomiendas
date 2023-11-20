@@ -31,9 +31,9 @@ namespace QueRecomiendas.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Foto")
+                    b.Property<byte[]>("Foto")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
@@ -42,6 +42,46 @@ namespace QueRecomiendas.Server.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Actores");
+                });
+
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.Generos", b =>
+                {
+                    b.Property<int>("GeneroId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("GeneroId");
+
+                    b.ToTable("Generos");
+                });
+
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.GenerosPeliculas", b =>
+                {
+                    b.Property<int>("GeneroPeliculaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GeneroId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("PeliculaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("GeneroPeliculaId");
+
+                    b.HasIndex("GeneroId");
+
+                    b.HasIndex("PeliculaId");
+
+                    b.ToTable("GenerosPeliculas");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Peliculas", b =>
@@ -110,6 +150,12 @@ namespace QueRecomiendas.Server.Migrations
                     b.Property<int>("Disponible")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("Foto")
+                        .HasColumnType("BLOB");
+
+                    b.Property<int>("Id")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("PeliculaId")
                         .HasColumnType("INTEGER");
 
@@ -142,6 +188,9 @@ namespace QueRecomiendas.Server.Migrations
                     b.Property<int>("Disponible")
                         .HasColumnType("INTEGER");
 
+                    b.Property<byte[]>("Foto")
+                        .HasColumnType("BLOB");
+
                     b.Property<int?>("PeliculasPeliculaId")
                         .HasColumnType("INTEGER");
 
@@ -157,57 +206,82 @@ namespace QueRecomiendas.Server.Migrations
                             TipoPeliculaId = 1,
                             Actores = "",
                             Categoria = "Acción",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 2,
                             Actores = "",
                             Categoria = "Terror",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 3,
                             Actores = "",
                             Categoria = "Ciencia ficción",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 4,
                             Actores = "",
                             Categoria = "Comedia",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 5,
                             Actores = "",
                             Categoria = "Aventura y animación",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 6,
                             Actores = "",
                             Categoria = "Histórico",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 7,
                             Actores = "",
                             Categoria = "Suspenso",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         },
                         new
                         {
                             TipoPeliculaId = 8,
                             Actores = "",
                             Categoria = "Documental",
-                            Disponible = 0
+                            Disponible = 0,
+                            Foto = new byte[0]
                         });
+                });
+
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.GenerosPeliculas", b =>
+                {
+                    b.HasOne("QueRecomiendas.Shared.Models.Generos", "Genero")
+                        .WithMany("GenerosPeliculas")
+                        .HasForeignKey("GeneroId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QueRecomiendas.Shared.Models.Peliculas", "Pelicula")
+                        .WithMany()
+                        .HasForeignKey("PeliculaId");
+
+                    b.Navigation("Genero");
+
+                    b.Navigation("Pelicula");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.PeliculasActores", b =>
@@ -256,6 +330,11 @@ namespace QueRecomiendas.Server.Migrations
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Actores", b =>
                 {
                     b.Navigation("peliculasActores");
+                });
+
+            modelBuilder.Entity("QueRecomiendas.Shared.Models.Generos", b =>
+                {
+                    b.Navigation("GenerosPeliculas");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Peliculas", b =>

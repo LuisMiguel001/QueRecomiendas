@@ -5,88 +5,87 @@
 <h3>Crear Actor</h3>
 
 <EditForm Model="actor" OnValidSubmit="GuardarActor">
-    <DataAnnotationsValidator />
+	<DataAnnotationsValidator />
 
-    <div class="form-group">
-        <label for="nombre">Nombre:</label>
-        <InputText id="nombre" @bind-Value="actor.Nombre" class="form-control" />
-        <ValidationMessage For="@(() => actor.Nombre)" />
-    </div>
+	<div class="mb-3">
+		<div class="mb-3">
+			<div class="input-group">
+				<InputFile OnChange="OnChange" class="form-control" accept=".png, .jpg, .jpeg" />
+			</div>
+			<ValidationMessage For="@(() => actor.Foto)" />
+		</div>
+		@if (actor.Foto != null)
+		{
+			<img src="@Convert.ToBase64String(actor.Foto)" alt="Imagen seleccionada" />
+		}
+	</div>
 
-    <div class="form-group">
-        <label for="biografia">Biografía:</label>
-        <InputText id="biografia" @bind-Value="actor.Biografia" class="form-control" />
-        <ValidationMessage For="@(() => actor.Biografia)" />
-    </div>
+	<div class="form-group">
+		<label for="nombre">Nombre:</label>
+		<InputText id="nombre" @bind-Value="actor.Nombre" class="form-control" />
+		<ValidationMessage For="@(() => actor.Nombre)" />
+	</div>
 
-    <div class="form-group">
-        <label for="foto">Foto URL:</label>
-        <InputText id="foto" @bind-Value="actor.Foto" class="form-control" />
-        <ValidationMessage For="@(() => actor.Foto)" />
-    </div>
+	<div class="form-group">
+		<label for="biografia">Biografía:</label>
+		<InputText id="biografia" @bind-Value="actor.Biografia" class="form-control" />
+		<ValidationMessage For="@(() => actor.Biografia)" />
+	</div>
 
-    <div class="form-group">
-        <label for="fechaNacimiento">Fecha de Nacimiento:</label>
-        <InputDate id="fechaNacimiento" @bind-Value="actor.FechaNacimiento" class="form-control" />
-        <ValidationMessage For="@(() => actor.FechaNacimiento)" />
-    </div>
+	<div class="form-group">
+		<label for="fechaNacimiento">Fecha de Nacimiento:</label>
+		<InputDate id="fechaNacimiento" @bind-Value="actor.FechaNacimiento" class="form-control" />
+		<ValidationMessage For="@(() => actor.FechaNacimiento)" />
+	</div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
+	<button type="submit" class="btn btn-primary">Guardar</button>
 </EditForm>
 
 @code {
-    private Actores actor = new Actores();
+	private Actores actor = new Actores();
 
-    private async Task GuardarActor()
-    {
-        try
-        {
-            // Aquí debes enviar el actor al servidor para guardarlo en la base de datos
-            // Puedes usar httpClient.PostAsJsonAsync u otro método según tu implementación
+	async Task OnChange(InputFileChangeEventArgs e)
+	{
+		var archivo = e.File;
+		var buffer = new byte[archivo.Size];
 
-            // Primero, verifica si el actor tiene datos válidos antes de enviarlo al servidor
-            if (ValidarDatosActor())
-            {
-                // Realiza la solicitud HTTP para guardar el actor
-                var response = await httpClient.PostAsJsonAsync("api/Actores", actor);
+		await archivo.OpenReadStream().ReadAsync(buffer);
+		actor.Foto = buffer;
+	}
 
-                // Verifica si la operación fue exitosa (código de respuesta 2xx)
-                if (response.IsSuccessStatusCode)
-                {
-                    // Limpiar el formulario o realizar cualquier otra acción necesaria después de guardar
-                    actor = new Actores();
+	private async Task GuardarActor()
+	{
+		try
+		{
+			if (ValidarDatosActor())
+			{				
+				var response = await httpClient.PostAsJsonAsync("api/Actores", actor);
 
-                    // Redirige al usuario a la página de registro de películas
-                    navigationManager.NavigateTo("/pelicula");
-                }
-                else
-                {
-                    // Maneja el caso en que la operación no fue exitosa
-                    // Puedes mostrar un mensaje de error o realizar otras acciones según tus necesidades
-                    // Por ejemplo, puedes extraer el mensaje de error del cuerpo de la respuesta:
-                    var errorMessage = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error al guardar el actor: {errorMessage}");
-                }
-            }
-            else
-            {
-                // Maneja el caso en que los datos del actor no son válidos
-                // Puedes mostrar un mensaje de validación o realizar otras acciones según tus necesidades
-                Console.WriteLine("Los datos del actor no son válidos. Por favor, verifica los campos.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // Maneja cualquier excepción que pueda ocurrir durante la operación
-            Console.WriteLine($"Error al intentar guardar el actor: {ex.Message}");
-        }
-    }
+				if (response.IsSuccessStatusCode)
+				{
+					actor = new Actores();
 
-    private bool ValidarDatosActor()
-    {
-        // Realiza validaciones adicionales según tus requisitos
-        // Puedes verificar que los campos obligatorios estén llenos, la longitud de las cadenas, etc.
-        // Devuelve true si los datos son válidos, de lo contrario, devuelve false
-        return !string.IsNullOrEmpty(actor.Nombre) && !string.IsNullOrEmpty(actor.Foto);
-    }
+					navigationManager.NavigateTo("/pelicula");
+				}
+				else
+				{
+					var errorMessage = await response.Content.ReadAsStringAsync();
+					Console.WriteLine($"Error al guardar el actor: {errorMessage}");
+				}
+			}
+			else
+			{
+				Console.WriteLine("Los datos del actor no son válidos. Por favor, verifica los campos.");
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al intentar guardar el actor: {ex.Message}");
+		}
+	}
+
+	private bool ValidarDatosActor()
+	{
+		return !string.IsNullOrEmpty(actor.Nombre);
+	}
 }

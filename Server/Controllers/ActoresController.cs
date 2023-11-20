@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace QueRecomiendas.Server.Controllers;
+
 [ApiController]
 [Route("api/[controller]")]
 public class ActoresController : ControllerBase

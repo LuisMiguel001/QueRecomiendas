@@ -107,19 +107,20 @@
 						<ValidationMessage For="@(() => detalle.TipoPeliculaId)" />
 					</div>
 
-					@*Autores*@
+					@* Autores *@
 					<div class="col-md-6">
 						<label>Actores:</label>
 						<div class="input-group">
 							<InputSelect @bind-Value="detalle.Actores" class="form-select">
-								<option value="@pelicula.peliActor" hidden="hidden">[Seleccione]</option>
+								<option value="@actor.Id" hidden="hidden">[Seleccione]</option>
 								@foreach (var item in actoresList)
 								{
-									<option value="@item.Id">@item.Nombre</option>
+									<option value="@item.Nombre">@item.Nombre</option>
 								}
 							</InputSelect>
 							<button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
 						</div>
+						<ValidationMessage For="@(() => detalle.Actores)" />
 					</div>
 				</div>
 
@@ -130,7 +131,7 @@
 						<tr class="table">
 							<th>Pelicula ID</th>
 							<th>Generos</th>
-							<th>Actores</th>
+							<th>Actor</th>
 						</tr>
 					</thead>
 
@@ -144,17 +145,25 @@
 								<td><button type="button" class="btn btn-outline-danger" @onclick=@(() => RemoverDetalle(item))><i class="oi oi-trash" /></button></td>
 							</tr>
 						}
-					</tbody>
-
-					@*<tbody>
-						@foreach (var item in this.actor.PeliculasActores)
+						@*foreach (var itemn in this.actoresList)
 						{
-							<tr>
-								<td>@ObtenerDescripcionActor(item.Id)</td>
-								<td><button type="button" class="btn btn-outline-danger" @onclick=@(() => RemoverActores(item))><i class="oi oi-trash" /></button></td>
-							</tr>
+						<tr>
+						<td>@itemn.Nombre</td>
+						<td>
+						@if (itemn.Foto != null && itemn.Foto.Length > 0)
+						{
+						var base64 = Convert.ToBase64String(itemn.Foto);
+						var imgSrc = $"data:image/jpeg;base64,{base64}";
+						<img src="@imgSrc" alt="Imagen de la película" class="img-fluid img-thumbnail" style="max-width: 75px; max-height: 75px;" />
 						}
-					</tbody>*@
+						else
+						{
+						<p>la imagen está vacía</p>
+						}
+						</td>
+						</tr>
+						}*@
+					</tbody>
 				</table>
 				<hr />
 			</fieldset>
@@ -192,7 +201,7 @@
 	public int TipoPeliculaSeleccionado { get; set; } = 0;
 	public string PeliculaSeleccionado { get; set; } = string.Empty;
 	public string ValidacionDetalle { get; set; } = string.Empty;
-	//peliActor
+
 	public PeliculasDetalle detalle { get; set; } = new PeliculasDetalle();
 	public IEnumerable<TipoPeliculas> TiposPeliculasList { get; set; } = Enumerable.Empty<TipoPeliculas>();
 	public IEnumerable<Actores> actoresList { get; set; } = Enumerable.Empty<Actores>();
@@ -271,7 +280,6 @@
 
 	public async Task Guardar()
 	{
-
 		using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
 
 		if (response.IsSuccessStatusCode)
@@ -281,8 +289,8 @@
 			if (peliculaDevuelta is not null)
 			{
 				this.pelicula = peliculaDevuelta;
-				this.pelicula.peliActor = autoresSeleccionados.Select(actorId => new PeliculasActores { ActorId = actorId }).ToList();
 				Nuevo();
+				//this.pelicula.peliActor = autoresSeleccionados.Select(actorId => new PeliculasActores { ActorId = actorId }).ToList();
 				//notificationService.ShowNotification(
 				//	titulo: "Exito",
 				//	mensaje: "Registro guardado",
@@ -306,6 +314,7 @@
 			//	NotificationSeverity.Error
 			//);
 		}
+
 	}
 
 	public void Nuevo()
@@ -387,54 +396,70 @@
 
 	public async Task AgregarDetalle()
 	{
-		if (ValidarDetalle())
-		{
-			var pelicula = await BuscarPeliculas(detalle.TipoPeliculaId);
-			if (pelicula != null)
-			{
-				detalle.PeliculaId = this.pelicula.PeliculaId;
-				this.pelicula.peliculaDetalle.Add(detalle);
-				detalle = new PeliculasDetalle();
+		var pelicula = await BuscarPeliculas(detalle.TipoPeliculaId);
 
-				//notificationService.ShowNotification(
-				//	titulo: "Éxito",
-				//	mensaje: "Detalle Agregado",
-				//	NotificationSeverity.Success
-				//);
-			}
-			else
-			{
-				//notificationService.ShowNotification(
-				//	titulo: "Error",
-				//	mensaje: "Tipo de película no válido. Asegúrese de seleccionar un Tipo de Película existente.",
-				//	NotificationSeverity.Error
-				//);
-			}
+		if (pelicula != null)
+		{
+			detalle.PeliculaId = this.pelicula.PeliculaId;
+			this.pelicula.peliculaDetalle.Add(detalle);
+			detalle = new PeliculasDetalle();
+
+			//notificationService.ShowNotification(
+			//	titulo: "Éxito",
+			//	mensaje: "Detalle Agregado",
+			//	NotificationSeverity.Success
+			//);
+		}
+
+		var actor = actoresList.FirstOrDefault(a => a.Nombre == detalle.Actores);
+
+		if (actor != null)
+		{
+			detalle.Foto = actor.Foto;
+			detalle.Actores = actor.Nombre;
+
+			detalle.PeliculaId = this.pelicula.PeliculaId;
+			this.pelicula.peliculaDetalle.Add(detalle);
+			detalle = new PeliculasDetalle();
 		}
 	}
+
+
+	//public async Task AgregarDetalle()
+	//{
+	//	if (ValidarDetalle())
+	//	{
+	//		var pelicula = await BuscarPeliculas(detalle.TipoPeliculaId);
+	//		if (pelicula != null)
+	//		{
+	//			detalle.PeliculaId = this.pelicula.PeliculaId;
+	//			this.pelicula.peliculaDetalle.Add(detalle);
+	//			detalle = new PeliculasDetalle();
+
+	//			//notificationService.ShowNotification(
+	//			//	titulo: "Éxito",
+	//			//	mensaje: "Detalle Agregado",
+	//			//	NotificationSeverity.Success
+	//			//);
+	//		}
+	//		else
+	//		{
+	//			//notificationService.ShowNotification(
+	//			//	titulo: "Error",
+	//			//	mensaje: "Tipo de película no válido. Asegúrese de seleccionar un Tipo de Película existente.",
+	//			//	NotificationSeverity.Error
+	//			//);
+	//		}
+	//	}
+	//}
 
 	public string ObtenerDescripcion(int Id)
 	{
 		return TiposPeliculasList.Where(p => p.TipoPeliculaId == Id).FirstOrDefault().Categoria;
 	}
 
-	//public (string nombre, string foto) ObtenerDescripcionActor(int Id)
-	//{
-	//	var actor = actoresList.FirstOrDefault(a => a.Id == Id);
-
-	//	return (actor.Nombre, actor.Foto);
-	//}
-
 	public void RemoverDetalle(PeliculasDetalle detalle)
 	{
 		pelicula.peliculaDetalle.Remove(detalle);
 	}
-
-	//public void RemoverActores(PeliculasActores actores)
-	//{
-	//	actor.peliculasActores.Remove(actores);
-	//}
 }
-
-
-

@@ -19,6 +19,8 @@ public class TipoPeliculas
 
 	public int Disponible { get; set; }
 
-	[Required(ErrorMessage = "El el campo Actores no puede estar vacío")]
+    [Required(ErrorMessage = "El el campo Actores no puede estar vacío")]
 	public string? Actores { get; set; }
+
+	public byte[]? Foto { get; set; }
 }

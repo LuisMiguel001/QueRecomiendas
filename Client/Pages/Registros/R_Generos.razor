@@ -1,0 +1,64 @@
+﻿@page "/creargenero"
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+<h3>Crear Género</h3>
+
+<EditForm Model="genero" OnValidSubmit="GuardarGenero">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <InputText id="nombre" @bind-Value="genero.Nombre" class="form-control" />
+        <ValidationMessage For="@(() => genero.Nombre)" />
+    </div>
+
+    <div class="form-group">
+        <label for="descripcion">Descripción:</label>
+        <InputText id="descripcion" @bind-Value="genero.Descripcion" class="form-control" />
+        <ValidationMessage For="@(() => genero.Descripcion)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+    private Generos genero = new Generos();
+
+    private async Task GuardarGenero()
+    {
+        try
+        {
+            if (ValidarDatosGenero())
+            {
+                var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    genero = new Generos();
+
+                    navigationManager.NavigateTo("/pelicula");
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error al guardar el género: {errorMessage}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Los datos del género no son válidos. Por favor, verifica los campos.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al intentar guardar el género: {ex.Message}");
+        }
+    }
+
+    private bool ValidarDatosGenero()
+    {
+        return !string.IsNullOrEmpty(genero.Nombre);
+    }
+}
+

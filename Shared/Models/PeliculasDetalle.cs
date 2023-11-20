@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,13 +15,17 @@ public class PeliculasDetalle
 
 	public int PeliculaId { get; set; }
 
-	[Required(ErrorMessage = "Debe Elegir un Genero")]
+    public int Id { get; set; }
+
+    [Required(ErrorMessage = "Debe Elegir un Genero")]
 	public int TipoPeliculaId { get; set; }
 
     public TipoPeliculas TipoPelicula { get; set; }
 
     public int Disponible { get; set; }
 
-	[Required(ErrorMessage = "El campo Actores no puede estar vacío")]
+	[Required(ErrorMessage = "El Campo Actores no puede estar vacío")]
 	public string? Actores { get; set; }
+
+	public byte[]? Foto { get; set; }
 }

@@ -5,12 +5,7 @@
 	<div class="card-header">
 		<h3 class="card align-items-center">Movies</h3>
 	</div>
-	<style>
-		.red-card {
-			background-color: #ff0000;
-			color: #ffffff;
-		}
-	</style>
+
 	<div class="card-body">
 		<form>
 			<div class="input-group mb-3">
@@ -32,19 +27,17 @@
 				@foreach (var pelicula in Pelicula)
 				{
 					<div class="col-md-4 mb-4">
-						<div class="card red-card">
-							<div class="card-body text-center">
-								@if (pelicula.Imagen != null)
-								{
-									var base64 = Convert.ToBase64String(pelicula.Imagen);
-									var imgSrc = $"data:image/jpeg;base64,{base64}";
-									<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" />
-								}
-							</div>
-						</div>
-						<div class="align-content-center">
-							<div class="text-center">
-								<a href="detallepelicula/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
+						<div class="card-body text-center">
+							@if (pelicula.Imagen != null)
+							{
+								var base64 = Convert.ToBase64String(pelicula.Imagen);
+								var imgSrc = $"data:image/jpeg;base64,{base64}";
+								<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
+							}
+							<div class="align-content-center">
+								<div class="text-center">
+									<a href="detallepelicula/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
+								</div>
 							</div>
 						</div>
 					</div>
