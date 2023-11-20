@@ -12,87 +12,90 @@ namespace QueRecomiendas.Server.Controllers;
 [Route("api/[controller]")]
 public class GenerosController : ControllerBase
 {
-    private readonly PeliculasContext _context;
+	private readonly PeliculasContext _context;
 
-    public GenerosController(PeliculasContext context)
-    {
-        _context = context;
-    }
+	public GenerosController(PeliculasContext context)
+	{
+		_context = context;
+	}
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Generos>>> GetGenerosPelicula()
-    {
-        return await _context.Generos.ToListAsync();
-    }
+	[HttpGet]
+	public async Task<ActionResult<IEnumerable<Generos>>> GetGenerosPelicula()
+	{
+		return await _context.Generos.ToListAsync();
+	}
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult<Generos>> GetGeneroPelicula(int id)
-    {
-        var genero = await _context.Generos.FindAsync(id);
+	[HttpGet("{id}")]
+	public async Task<ActionResult<Generos>> GetGeneroPelicula(int id)
+	{
+		var genero = await _context.Generos.FindAsync(id);
 
-        if (genero == null)
-        {
-            return NotFound();
-        }
+		if (genero == null)
+		{
+			return NotFound();
+		}
 
-        return genero;
-    }
+		return genero;
+	}
 
-    [HttpPost]
-    public async Task<ActionResult<Generos>> PostGeneroPelicula(Generos genero)
-    {
-        _context.Generos.Add(genero);
-        await _context.SaveChangesAsync();
+	[HttpPost]
+	public async Task<ActionResult<Generos>> PostGeneroPelicula(Generos genero)
+	{
+		if (!GeneroPeliculaExists(genero.GeneroId))
+			_context.Generos.Add(genero);
+		else
+			_context.Generos.Update(genero);
 
-        return CreatedAtAction("GetGeneroPelicula", new { id = genero.GeneroId }, genero);
-    }
+		await _context.SaveChangesAsync();
+		return CreatedAtAction("GetGeneroPelicula", new { id = genero.GeneroId }, genero);
+	}
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutGeneroPelicula(int id, Generos genero)
-    {
-        if (id != genero.GeneroId)
-        {
-            return BadRequest();
-        }
+	[HttpPut("{id}")]
+	public async Task<IActionResult> PutGeneroPelicula(int id, Generos genero)
+	{
+		if (id != genero.GeneroId)
+		{
+			return BadRequest();
+		}
 
-        _context.Entry(genero).State = EntityState.Modified;
+		_context.Entry(genero).State = EntityState.Modified;
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!GeneroPeliculaExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
+		try
+		{
+			await _context.SaveChangesAsync();
+		}
+		catch (DbUpdateConcurrencyException)
+		{
+			if (!GeneroPeliculaExists(id))
+			{
+				return NotFound();
+			}
+			else
+			{
+				throw;
+			}
+		}
 
-        return NoContent();
-    }
+		return NoContent();
+	}
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteGeneroPelicula(int id)
-    {
-        var genero = await _context.Generos.FindAsync(id);
-        if (genero == null)
-        {
-            return NotFound();
-        }
+	[HttpDelete("{id}")]
+	public async Task<IActionResult> DeleteGeneroPelicula(int id)
+	{
+		var genero = await _context.Generos.FindAsync(id);
+		if (genero == null)
+		{
+			return NotFound();
+		}
 
-        _context.Generos.Remove(genero);
-        await _context.SaveChangesAsync();
+		_context.Generos.Remove(genero);
+		await _context.SaveChangesAsync();
 
-        return NoContent();
-    }
+		return NoContent();
+	}
 
-    private bool GeneroPeliculaExists(int id)
-    {
-        return _context.Generos.Any(e => e.GeneroId == id);
-    }
+	private bool GeneroPeliculaExists(int id)
+	{
+		return _context.Generos.Any(e => e.GeneroId == id);
+	}
 }

@@ -22,7 +22,7 @@ public class Actores
 	public byte[]? Foto { get; set; }
 
 	[Required(ErrorMessage = "La Fecha de Nacimiento es Requerida")]
-	public DateTime? FechaNacimiento { get; set; }
+	public DateTime FechaNacimiento { get; set; } = DateTime.Today;
 
 	public List<PeliculasActores> peliculasActores { get; set; } = new List<PeliculasActores>();
 

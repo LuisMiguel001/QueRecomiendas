@@ -1,0 +1,71 @@
+﻿@page "/c_actores"
+@inject HttpClient httpClient
+
+<div class="container">
+	<div class="card shadow-lg">
+
+		@*Encabezado*@
+		<div class="card-header">
+			<h3 class="card align-items-center">Actores</h3>
+		</div>
+
+		@if (actores is null)
+		{
+						<p>Cargando...</p>
+		}
+		else
+		{
+			<table class="table">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Foto</th>
+						<th>Nombre</th>
+						<th>Fecha de Nacimiento</th>
+						<th>Biograf&iacute;a</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var actor in actores)
+					{
+						<tr>
+							<td>@actor.Id</td>
+							<td>
+								@if (actor.Foto != null)
+								{
+									<img src="@($"data:image/png;base64,{Convert.ToBase64String(actor.Foto)}")" alt="Imagen del actor" style="max-width: 100px; max-height: 100px;" />
+								}
+							</td>
+							<td>@actor.Nombre</td>
+							<td>@actor.FechaNacimiento.ToShortDateString()</td>
+							<td>@actor.Biografia</td>
+							<td><a class="btn btn-outline-primary" href="R_actores/@actor.Id">Ver</a></td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+
+	</div>
+</div>
+
+@code {
+	private List<Actores> actores;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await CargarActores();
+	}
+
+	private async Task CargarActores()
+	{
+		try
+		{
+			actores = await httpClient.GetFromJsonAsync<List<Actores>>("api/Actores");
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al cargar los actores: {ex.Message}");
+		}
+	}
+}

@@ -28,11 +28,11 @@ public class Peliculas
 
 	public string? Trailer { get; set; }
 
-	public int TipoPeliculaId { get; set; }
-
-	public IEnumerable<TipoPeliculas>? TiposPeliculasList { get; set; }
+	public int GeneroId { get; set; }
 
 	public List<PeliculasActores> peliActor { get; set; } = new List<PeliculasActores>();
+
+	public List<GenerosPeliculas> generopeli { get; set; } = new List<GenerosPeliculas>();
 
 	[ForeignKey("PeliculaId")]
 	public ICollection<PeliculasDetalle> peliculaDetalle { get; set; } = new List<PeliculasDetalle>();

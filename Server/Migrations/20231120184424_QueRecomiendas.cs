@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace QueRecomiendas.Server.Migrations
 {
     /// <inheritdoc />
@@ -35,7 +33,7 @@ namespace QueRecomiendas.Server.Migrations
                 {
                     GeneroId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Nombre = table.Column<string>(type: "TEXT", nullable: false),
+                    Categoria = table.Column<string>(type: "TEXT", nullable: false),
                     Descripcion = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -54,7 +52,7 @@ namespace QueRecomiendas.Server.Migrations
                     FechaEstreno = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Resena = table.Column<string>(type: "TEXT", nullable: false),
                     Trailer = table.Column<string>(type: "TEXT", nullable: true),
-                    TipoPeliculaId = table.Column<int>(type: "INTEGER", nullable: false)
+                    GeneroId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -87,6 +85,38 @@ namespace QueRecomiendas.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PeliculaDetalle",
+                columns: table => new
+                {
+                    PeliculasDetalleId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    PeliculaId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Id = table.Column<int>(type: "INTEGER", nullable: false),
+                    GeneroId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Disponible = table.Column<int>(type: "INTEGER", nullable: false),
+                    Actores = table.Column<string>(type: "TEXT", nullable: false),
+                    Foto = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    Categoria = table.Column<string>(type: "TEXT", nullable: true),
+                    Descripcion = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PeliculaDetalle", x => x.PeliculasDetalleId);
+                    table.ForeignKey(
+                        name: "FK_PeliculaDetalle_Generos_GeneroId",
+                        column: x => x.GeneroId,
+                        principalTable: "Generos",
+                        principalColumn: "GeneroId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PeliculaDetalle_Peliculas_PeliculaId",
+                        column: x => x.PeliculaId,
+                        principalTable: "Peliculas",
+                        principalColumn: "PeliculaId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PeliculasActores",
                 columns: table => new
                 {
@@ -112,73 +142,6 @@ namespace QueRecomiendas.Server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "TipoPeliculas",
-                columns: table => new
-                {
-                    TipoPeliculaId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Categoria = table.Column<string>(type: "TEXT", nullable: false),
-                    Disponible = table.Column<int>(type: "INTEGER", nullable: false),
-                    Actores = table.Column<string>(type: "TEXT", nullable: false),
-                    Foto = table.Column<byte[]>(type: "BLOB", nullable: true),
-                    PeliculasPeliculaId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TipoPeliculas", x => x.TipoPeliculaId);
-                    table.ForeignKey(
-                        name: "FK_TipoPeliculas_Peliculas_PeliculasPeliculaId",
-                        column: x => x.PeliculasPeliculaId,
-                        principalTable: "Peliculas",
-                        principalColumn: "PeliculaId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PeliculaDetalle",
-                columns: table => new
-                {
-                    PeliculasDetalleId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    PeliculaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
-                    TipoPeliculaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Disponible = table.Column<int>(type: "INTEGER", nullable: false),
-                    Actores = table.Column<string>(type: "TEXT", nullable: false),
-                    Foto = table.Column<byte[]>(type: "BLOB", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PeliculaDetalle", x => x.PeliculasDetalleId);
-                    table.ForeignKey(
-                        name: "FK_PeliculaDetalle_Peliculas_PeliculaId",
-                        column: x => x.PeliculaId,
-                        principalTable: "Peliculas",
-                        principalColumn: "PeliculaId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PeliculaDetalle_TipoPeliculas_TipoPeliculaId",
-                        column: x => x.TipoPeliculaId,
-                        principalTable: "TipoPeliculas",
-                        principalColumn: "TipoPeliculaId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "TipoPeliculas",
-                columns: new[] { "TipoPeliculaId", "Actores", "Categoria", "Disponible", "Foto", "PeliculasPeliculaId" },
-                values: new object[,]
-                {
-                    { 1, "", "Acción", 0, new byte[0], null },
-                    { 2, "", "Terror", 0, new byte[0], null },
-                    { 3, "", "Ciencia ficción", 0, new byte[0], null },
-                    { 4, "", "Comedia", 0, new byte[0], null },
-                    { 5, "", "Aventura y animación", 0, new byte[0], null },
-                    { 6, "", "Histórico", 0, new byte[0], null },
-                    { 7, "", "Suspenso", 0, new byte[0], null },
-                    { 8, "", "Documental", 0, new byte[0], null }
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_GenerosPeliculas_GeneroId",
                 table: "GenerosPeliculas",
@@ -190,14 +153,14 @@ namespace QueRecomiendas.Server.Migrations
                 column: "PeliculaId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PeliculaDetalle_GeneroId",
+                table: "PeliculaDetalle",
+                column: "GeneroId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PeliculaDetalle_PeliculaId",
                 table: "PeliculaDetalle",
                 column: "PeliculaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PeliculaDetalle_TipoPeliculaId",
-                table: "PeliculaDetalle",
-                column: "TipoPeliculaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PeliculasActores_ActorId",
@@ -208,11 +171,6 @@ namespace QueRecomiendas.Server.Migrations
                 name: "IX_PeliculasActores_PeliculaId",
                 table: "PeliculasActores",
                 column: "PeliculaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TipoPeliculas_PeliculasPeliculaId",
-                table: "TipoPeliculas",
-                column: "PeliculasPeliculaId");
         }
 
         /// <inheritdoc />
@@ -229,9 +187,6 @@ namespace QueRecomiendas.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "Generos");
-
-            migrationBuilder.DropTable(
-                name: "TipoPeliculas");
 
             migrationBuilder.DropTable(
                 name: "Actores");

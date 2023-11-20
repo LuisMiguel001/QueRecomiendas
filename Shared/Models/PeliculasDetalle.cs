@@ -18,14 +18,18 @@ public class PeliculasDetalle
     public int Id { get; set; }
 
     [Required(ErrorMessage = "Debe Elegir un Genero")]
-	public int TipoPeliculaId { get; set; }
+	public int GeneroId { get; set; }
 
-    public TipoPeliculas TipoPelicula { get; set; }
+    public Generos Genero { get; set; }
 
     public int Disponible { get; set; }
 
 	[Required(ErrorMessage = "El Campo Actores no puede estar vacío")]
 	public string? Actores { get; set; }
 
-	public byte[]? Foto { get; set; }
+	public byte[]? Foto { get; set; }	
+	
+	public string? Categoria { get; set; }
+
+	public string? Descripcion { get; set; }
 }

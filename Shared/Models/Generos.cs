@@ -14,7 +14,7 @@ public class Generos
 	public int GeneroId { get; set; }
 
 	[Required(ErrorMessage = "El campo {0} es requerido")]
-	public string Nombre { get; set; } = null!;
+	public string Categoria { get; set; } = null!;
 
 	[Required(ErrorMessage = "El campo {0} es requerido")]
 	public string Descripcion { get; set; } = null!;

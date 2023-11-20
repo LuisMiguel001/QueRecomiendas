@@ -41,9 +41,12 @@ public class ActoresController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult<Actores>> PostActor(Actores actor)
 	{
-		_context.Actores.Add(actor);
-		await _context.SaveChangesAsync();
+		if (!ActorExists(actor.Id))
+			_context.Actores.Add(actor);
+		else
+			_context.Actores.Update(actor);
 
+		await _context.SaveChangesAsync();
 		return CreatedAtAction("GetActor", new { id = actor.Id }, actor);
 	}
 

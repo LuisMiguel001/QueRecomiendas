@@ -37,7 +37,7 @@ else
 		<h1>@Pelicula.Titulo</h1>
 
 		<span>
-			<strong>Géneros:</strong> Acci&oacute;n @PeliculaDetalle.TipoPelicula?.Categoria | <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+				<strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
 		</span>
 
 		<br>
@@ -69,10 +69,6 @@ else
 		<div class="detalle-item">
 			<strong>Resumen</strong><br>@Pelicula.Resena
 		</div>
-
-		<div class="detalle-item">
-			<strong>Autores:</strong> @PeliculaDetalle.TipoPelicula?.Actores
-		</div>
 	</div>
 }
 
@@ -87,7 +83,7 @@ else
 		try
 		{
 			Pelicula = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{PeliculaId}");
-			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/TipoPeli/{PeliculaId}");
+			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{PeliculaId}");
 		}
 		catch (HttpRequestException e)
 		{

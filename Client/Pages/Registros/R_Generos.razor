@@ -1,64 +1,147 @@
-﻿@page "/creargenero"
+﻿@page "/R_generos"
 @inject HttpClient httpClient
 @inject NavigationManager navigationManager
 
 <h3>Crear Género</h3>
 
 <EditForm Model="genero" OnValidSubmit="GuardarGenero">
-    <DataAnnotationsValidator />
+	<DataAnnotationsValidator />
 
-    <div class="form-group">
-        <label for="nombre">Nombre:</label>
-        <InputText id="nombre" @bind-Value="genero.Nombre" class="form-control" />
-        <ValidationMessage For="@(() => genero.Nombre)" />
-    </div>
+	<div class="container">
+		<div class="card shadow-lg">
 
-    <div class="form-group">
-        <label for="descripcion">Descripción:</label>
-        <InputText id="descripcion" @bind-Value="genero.Descripcion" class="form-control" />
-        <ValidationMessage For="@(() => genero.Descripcion)" />
-    </div>
+			@*Encabezado*@
+			<div class="card-header">
+				<h3 class="card align-items-center">Registrar G&eacute;neros</h3>
+			</div>
 
-    <button type="submit" class="btn btn-primary">Guardar</button>
+			<div class="card-body">
+				@*Buscar*@
+				<div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
+					<div class="input-group mb-3">
+						<span class="input-group-text">Buscar</span>
+						<InputNumber @bind-Value="genero.GeneroId" class="form-control" aria-describedby="buscarButton" />
+						<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
+							<i class="oi oi-magnifying-glass" />
+						</button>
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<div Class="form-group">
+						<div class="input-group">
+							<span class="input-group-text">G&eacute;nero</span>
+							<InputText id="categoria" @bind-Value="genero.Categoria" class="form-control" placeholder="Nombre del G&eacute;nero" />
+						</div>
+							<ValidationMessage For="@(() => genero.Categoria)" />
+					</div>
+				</div>
+
+				<div class="mb-3">
+					<div Class="form-group">
+						<div class="input-group">
+							<span class="input-group-text">Descripci&oacute;n</span>
+							<InputTextArea id="descripcion" @bind-Value="genero.Descripcion" class="form-control" placeholder="¿Sobre qué trata el Género?" />
+						</div>
+						<ValidationMessage For="@(() => genero.Descripcion)" />
+					</div>
+				</div>
+			</div>
+			<div class="card-footer d-flex justify-content-center">
+				<div class="btn-group" role="group">
+					<button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo</button>
+					<button type="submit" class="btn btn-outline-success"> <i class="oi oi-document" /> Guardar</button>
+					<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><i class="io io-trash" /> Eliminar</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </EditForm>
 
 @code {
-    private Generos genero = new Generos();
+	private Generos genero = new Generos();
 
-    private async Task GuardarGenero()
-    {
-        try
-        {
-            if (ValidarDatosGenero())
-            {
-                var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
+	private async Task GuardarGenero()
+	{
+		try
+		{
+			if (ValidarDatosGenero())
+			{
+				var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    genero = new Generos();
+				if (response.IsSuccessStatusCode)
+				{
+					genero = new Generos();
 
-                    navigationManager.NavigateTo("/pelicula");
-                }
-                else
-                {
-                    var errorMessage = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Error al guardar el género: {errorMessage}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Los datos del género no son válidos. Por favor, verifica los campos.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al intentar guardar el género: {ex.Message}");
-        }
-    }
+					navigationManager.NavigateTo("/pelicula");
+				}
+				else
+				{
+					var errorMessage = await response.Content.ReadAsStringAsync();
+					Console.WriteLine($"Error al guardar el género: {errorMessage}");
+				}
+			}
+			else
+			{
+				Console.WriteLine("Los datos del género no son válidos. Por favor, verifica los campos.");
+			}
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error al intentar guardar el género: {ex.Message}");
+		}
+	}
 
-    private bool ValidarDatosGenero()
-    {
-        return !string.IsNullOrEmpty(genero.Nombre);
-    }
+	public async Task Buscar()
+	{
+		var generoEncotrado = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{genero.GeneroId}");
+
+		if (generoEncotrado != null)
+		{
+			this.genero = generoEncotrado;
+			StateHasChanged();
+		}
+		else
+		{
+			//notificationService.ShowNotification(
+			//		titulo: "Error de búsqueda",
+			//		mensaje: "Registro no encontrado",
+			//		NotificationSeverity.Error
+			//);
+		}
+	}
+
+	public void Nuevo()
+	{
+		this.genero = new Generos();
+	}
+
+	public async Task Eliminar()
+	{
+		using var response = await httpClient.DeleteAsync($"api/Generos/{genero.GeneroId}");
+
+		if (!response.IsSuccessStatusCode)
+		{
+			//notificationService.ShowNotification(
+			//	titulo: "Error!",
+			//	mensaje: "No se pudo eliminar!",
+			//	NotificationSeverity.Error
+			//);
+			return;
+		}
+		else
+		{
+			Nuevo();
+			//notificationService.ShowNotification(
+			//	titulo: "Eliminado",
+			//	mensaje: "Se ha eliminado Correctamente",
+			//	NotificationSeverity.Success
+			//);
+		}
+	}
+
+	private bool ValidarDatosGenero()
+	{
+		return !string.IsNullOrEmpty(genero.Categoria);
+	}
 }
-
