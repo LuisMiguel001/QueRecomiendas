@@ -10,7 +10,9 @@ namespace QueRecomiendas.Shared.Models;
 
 public class Actores
 {
-	public int Id { get; set; }
+	[Key]
+
+	public int ActorId { get; set; }
 
 	[Required (ErrorMessage = "El Nombre es Requerido")]
 	public string Nombre { get; set; } = null!;
@@ -30,7 +32,7 @@ public class Actores
 	{
 		if (obj is Actores a2)
 		{
-			return Id == a2.Id;
+			return ActorId == a2.ActorId;
 		}
 
 		return false;

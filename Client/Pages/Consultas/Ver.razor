@@ -37,7 +37,7 @@ else
 		<h1>@Pelicula.Titulo</h1>
 
 		<span>
-				<strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+			<strong>Genero:</strong>@PeliculaDetalle.Categoria | <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
 		</span>
 
 		<br>
@@ -69,6 +69,21 @@ else
 		<div class="detalle-item">
 			<strong>Resumen</strong><br>@Pelicula.Resena
 		</div>
+
+		@*<div class="mt-2">
+	<h3>Actores</h3>
+	<div class="d-flex flex-column">
+	@foreach (var actores in Pelicula.peliculaDetalle)
+	{
+	<div class="mb-2">
+	<img style="width: 50px;" src="@actores.Actores" />
+	<span style="display: inline-block; width: 200px">@actores.</span>
+	<span style="display: inline-block; width: 45px">...</span>
+	<span>@actores.Personaje</span>
+	</div>
+	}
+	</div>
+	</div>*@
 	</div>
 }
 

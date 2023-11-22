@@ -41,19 +41,19 @@ public class ActoresController : ControllerBase
 	[HttpPost]
 	public async Task<ActionResult<Actores>> PostActor(Actores actor)
 	{
-		if (!ActorExists(actor.Id))
+		if (!ActorExists(actor.ActorId))
 			_context.Actores.Add(actor);
 		else
 			_context.Actores.Update(actor);
 
 		await _context.SaveChangesAsync();
-		return CreatedAtAction("GetActor", new { id = actor.Id }, actor);
+		return CreatedAtAction("GetActor", new { id = actor.ActorId }, actor);
 	}
 
 	[HttpPut("{id}")]
 	public async Task<IActionResult> PutActor(int id, Actores actor)
 	{
-		if (id != actor.Id)
+		if (id != actor.ActorId)
 		{
 			return BadRequest();
 		}
@@ -96,6 +96,6 @@ public class ActoresController : ControllerBase
 
 	private bool ActorExists(int id)
 	{
-		return _context.Actores.Any(e => e.Id == id);
+		return _context.Actores.Any(e => e.ActorId == id);
 	}
 }

@@ -19,7 +19,7 @@ namespace QueRecomiendas.Server.Migrations
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Actores", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("ActorId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -38,7 +38,7 @@ namespace QueRecomiendas.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
+                    b.HasKey("ActorId");
 
                     b.ToTable("Actores");
                 });
@@ -142,8 +142,10 @@ namespace QueRecomiendas.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ActorId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Actores")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Categoria")
@@ -158,9 +160,6 @@ namespace QueRecomiendas.Server.Migrations
                     b.Property<int>("GeneroId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("PeliculaId")
                         .HasColumnType("INTEGER");
 
@@ -168,8 +167,6 @@ namespace QueRecomiendas.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PeliculasDetalleId");
-
-                    b.HasIndex("GeneroId");
 
                     b.HasIndex("PeliculaId");
 
@@ -216,12 +213,6 @@ namespace QueRecomiendas.Server.Migrations
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.PeliculasDetalle", b =>
                 {
-                    b.HasOne("QueRecomiendas.Shared.Models.Generos", "Genero")
-                        .WithMany()
-                        .HasForeignKey("GeneroId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("QueRecomiendas.Shared.Models.Peliculas", null)
                         .WithMany("peliculaDetalle")
                         .HasForeignKey("PeliculaId")
@@ -231,8 +222,6 @@ namespace QueRecomiendas.Server.Migrations
                     b.HasOne("QueRecomiendas.Shared.Models.Peliculas", null)
                         .WithMany("peliDetalle")
                         .HasForeignKey("PeliculasPeliculaId");
-
-                    b.Navigation("Genero");
                 });
 
             modelBuilder.Entity("QueRecomiendas.Shared.Models.Actores", b =>

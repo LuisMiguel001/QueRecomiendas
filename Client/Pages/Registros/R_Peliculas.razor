@@ -113,11 +113,11 @@
 					<div class="col-md-6">
 						<label>Actores:</label>
 						<div class="input-group">
-							<InputSelect @bind-Value="detalle.Actores" class="form-select">
-								<option value="@actor.Id" hidden="hidden">[Seleccione]</option>
+							<InputSelect @bind-Value="detalle.ActorId" class="form-select">
+								<option value="@actor.ActorId" hidden="hidden">[Seleccione]</option>
 								@foreach (var item in actoresList)
 								{
-									<option value="@item.Nombre">@item.Nombre</option>
+									<option value="@item.ActorId">@item.Nombre</option>
 								}
 							</InputSelect>
 							<button type="button" class="btn btn-outline-success" @onclick="AgregarDetalle">Agregar <i class="oi oi-plus" /></button>
@@ -190,30 +190,12 @@
 	[Parameter]
 	public int PeliculaId { get; set; }
 	public Peliculas pelicula { get; set; } = new Peliculas();
-
-	public List<byte[]> imagenes { get; set; } = new List<byte[]>();
-	private const int tamañoMaximoArchivo = 2 * 1024 * 1024;
-	private string claseEncima = string.Empty;
-
 	private string Mensaje = string.Empty;
-
-	void OnDragEnter(DragEventArgs e) => claseEncima = "hover";
-	void OnDragLeave(DragEventArgs e) => claseEncima = string.Empty;
-
-	public int TipoPeliculaSeleccionado { get; set; } = 0;
-	public string PeliculaSeleccionado { get; set; } = string.Empty;
-	public string ValidacionDetalle { get; set; } = string.Empty;
-
 	public PeliculasDetalle detalle { get; set; } = new PeliculasDetalle();
-	//public IEnumerable<TipoPeliculas> TiposPeliculasList { get; set; } = Enumerable.Empty<TipoPeliculas>();
 	public List<Actores> actoresList { get; set; } = new List<Actores>();
 	public Actores actor { get; set; } = new Actores();
 	public List<Generos> generosList { get; set; } = new List<Generos>();
 	public Generos genero { get; set; } = new Generos();
-
-	//public List<int> autoresSeleccionados { get; set; } = new List<int>();
-	public int[] autoresSeleccionados { get; set; } = Array.Empty<int>();
-	//public List<Actores> autoresList { get; set; } = new List<Actores>();
 
 	async Task OnChange(InputFileChangeEventArgs e)
 	{
@@ -245,23 +227,6 @@
 			await Buscar();
 		}
 	}
-
-	//protected override async Task OnInitializedAsync()
-	//{
-	//	var tipos = await httpClient.GetFromJsonAsync<List<TipoPeliculas>>("api/TipoPeli");
-
-	//	if (tipos is not null)
-	//	{
-	//		TiposPeliculasList = tipos;
-	//		await CargarAutores();
-	//	}
-
-	//	if (PeliculaId > 0)
-	//	{
-	//		this.pelicula.PeliculaId = PeliculaId;
-	//		await Buscar();
-	//	}
-	//}
 
 	public async Task Buscar()
 	{
@@ -354,35 +319,26 @@
 	{
 		using var response = await httpClient.DeleteAsync($"api/Peliculas/{pelicula.PeliculaId}");
 
-		if (Validar())
+		if (!response.IsSuccessStatusCode)
 		{
-			if (!response.IsSuccessStatusCode)
-			{
-				//notificationService.ShowNotification(
-				//	titulo: "Error!",
-				//	mensaje: "No se pudo eliminar!",
-				//	NotificationSeverity.Error
-				//);
-				return;
-			}
-			else
-			{
-				Nuevo();
-				//notificationService.ShowNotification(
-				//	titulo: "Eliminado",
-				//	mensaje: "Se ha eliminado Correctamente",
-				//	NotificationSeverity.Success
-				//);
-			}
+			//notificationService.ShowNotification(
+			//	titulo: "Error!",
+			//	mensaje: "No se pudo eliminar!",
+			//	NotificationSeverity.Error
+			//);
+			return;
 		}
+		else
+		{
+			Nuevo();
+			//notificationService.ShowNotification(
+			//	titulo: "Eliminado",
+			//	mensaje: "Se ha eliminado Correctamente",
+			//	NotificationSeverity.Success
+			//);
+		}
+
 	}
-
-	//private async Task<TipoPeliculas> BuscarPeliculas(int peliculaId)
-	//{
-	//	var pelicula = await httpClient.GetFromJsonAsync<TipoPeliculas>($"api/TipoPeli/{peliculaId}");
-
-	//	return pelicula ?? new TipoPeliculas();
-	//}
 
 	public bool ValidarDetalle()
 	{
@@ -401,74 +357,23 @@
 
 	public async Task AgregarDetalle()
 	{
-		//var pelicula = await BuscarPeliculas(detalle.TipoPeliculaId);
+		var actor = actoresList.FirstOrDefault(a => a.ActorId == detalle.ActorId);
+		var genero = generosList.FirstOrDefault(a => a.GeneroId == detalle.GeneroId);
 
-		//if (pelicula != null)
-		//{
-		//	detalle.PeliculaId = this.pelicula.PeliculaId;
-		//	this.pelicula.peliculaDetalle.Add(detalle);
-		//	detalle = new PeliculasDetalle();
-
-		//	//notificationService.ShowNotification(
-		//	//	titulo: "Éxito",
-		//	//	mensaje: "Detalle Agregado",
-		//	//	NotificationSeverity.Success
-		//	//);
-		//}
-
-		var actor = actoresList.FirstOrDefault(a => a.Nombre == detalle.Actores);
-
-		if (actor != null)
+		if (actor != null && genero != null)
 		{
 			detalle.Foto = actor.Foto;
 			detalle.Actores = actor.Nombre;
-
-			detalle.PeliculaId = this.pelicula.PeliculaId;
-			this.pelicula.peliculaDetalle.Add(detalle);
-			detalle = new PeliculasDetalle();
-		}
-
-		var genero = generosList.FirstOrDefault(a => a.Categoria == detalle.Descripcion);
-
-		if (genero != null)
-		{
+			detalle.ActorId = actor.ActorId;
 			detalle.Categoria = genero.Categoria;
 			detalle.Descripcion = genero.Descripcion;
+			detalle.GeneroId = genero.GeneroId;
 
 			detalle.PeliculaId = this.pelicula.PeliculaId;
 			this.pelicula.peliculaDetalle.Add(detalle);
 			detalle = new PeliculasDetalle();
 		}
 	}
-
-
-	//public async Task AgregarDetalle()
-	//{
-	//	if (ValidarDetalle())
-	//	{
-	//		var pelicula = await BuscarPeliculas(detalle.TipoPeliculaId);
-	//		if (pelicula != null)
-	//		{
-	//			detalle.PeliculaId = this.pelicula.PeliculaId;
-	//			this.pelicula.peliculaDetalle.Add(detalle);
-	//			detalle = new PeliculasDetalle();
-
-	//			//notificationService.ShowNotification(
-	//			//	titulo: "Éxito",
-	//			//	mensaje: "Detalle Agregado",
-	//			//	NotificationSeverity.Success
-	//			//);
-	//		}
-	//		else
-	//		{
-	//			//notificationService.ShowNotification(
-	//			//	titulo: "Error",
-	//			//	mensaje: "Tipo de película no válido. Asegúrese de seleccionar un Tipo de Película existente.",
-	//			//	NotificationSeverity.Error
-	//			//);
-	//		}
-	//	}
-	//}
 
 	public string ObtenerDescripcion(int Id)
 	{
