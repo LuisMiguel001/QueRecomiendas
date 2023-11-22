@@ -249,6 +249,10 @@
 
 	public async Task Guardar()
 	{
+		foreach (var detalle in pelicula.peliculaDetalle.Where(d => d.PeliculasDetalleId == detalle.PeliculasDetalleId))
+		{
+			await RemoverDetalle(detalle);
+		}
 		using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
 
 		if (response.IsSuccessStatusCode)
@@ -380,8 +384,9 @@
 		return generosList.Where(p => p.GeneroId == Id).FirstOrDefault().Categoria;
 	}
 
-	public void RemoverDetalle(PeliculasDetalle detalle)
+	public async Task RemoverDetalle(PeliculasDetalle Detalle)
 	{
-		pelicula.peliculaDetalle.Remove(detalle);
+		pelicula.peliculaDetalle.Remove(Detalle);
+		await httpClient.DeleteAsync($"api/Peliculas/Detalle/{Detalle.PeliculasDetalleId}");
 	}
 }

@@ -81,6 +81,22 @@ public class PeliculasController : ControllerBase
 		return NoContent();
 	}
 
+	[HttpDelete("Detalle/{detalleId}")]
+	public async Task<ActionResult> DeleteDetalle(int detalleId)
+	{
+		var detalle = await _context.PeliculaDetalle.FindAsync(detalleId);
+
+		if (detalle == null)
+		{
+			return NotFound();
+		}
+
+		_context.PeliculaDetalle.Remove(detalle);
+		await _context.SaveChangesAsync();
+
+		return NoContent();
+	}
+
 	private bool Existe(int id)
 	{
 		return (_context.Peliculas?.Any(l => l.PeliculaId == id)).GetValueOrDefault();
