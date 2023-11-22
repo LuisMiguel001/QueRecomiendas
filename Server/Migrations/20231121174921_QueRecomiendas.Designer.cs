@@ -11,7 +11,7 @@ using QueRecomiendas.Server.DAL;
 namespace QueRecomiendas.Server.Migrations
 {
     [DbContext(typeof(PeliculasContext))]
-    [Migration("20231120184424_QueRecomiendas")]
+    [Migration("20231121174921_QueRecomiendas")]
     partial class QueRecomiendas
     {
         /// <inheritdoc />
@@ -30,8 +30,7 @@ namespace QueRecomiendas.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("FechaNacimiento")
-                        .IsRequired()
+                    b.Property<DateTime>("FechaNacimiento")
                         .HasColumnType("TEXT");
 
                     b.Property<byte[]>("Foto")
@@ -156,9 +155,6 @@ namespace QueRecomiendas.Server.Migrations
                     b.Property<string>("Descripcion")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Disponible")
-                        .HasColumnType("INTEGER");
-
                     b.Property<byte[]>("Foto")
                         .HasColumnType("BLOB");
 
@@ -171,11 +167,16 @@ namespace QueRecomiendas.Server.Migrations
                     b.Property<int>("PeliculaId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("PeliculasPeliculaId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("PeliculasDetalleId");
 
                     b.HasIndex("GeneroId");
 
                     b.HasIndex("PeliculaId");
+
+                    b.HasIndex("PeliculasPeliculaId");
 
                     b.ToTable("PeliculaDetalle");
                 });
@@ -230,6 +231,10 @@ namespace QueRecomiendas.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("QueRecomiendas.Shared.Models.Peliculas", null)
+                        .WithMany("peliDetalle")
+                        .HasForeignKey("PeliculasPeliculaId");
+
                     b.Navigation("Genero");
                 });
 
@@ -248,6 +253,8 @@ namespace QueRecomiendas.Server.Migrations
                     b.Navigation("generopeli");
 
                     b.Navigation("peliActor");
+
+                    b.Navigation("peliDetalle");
 
                     b.Navigation("peliculaDetalle");
                 });

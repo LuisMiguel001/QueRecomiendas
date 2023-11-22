@@ -93,11 +93,11 @@ namespace QueRecomiendas.Server.Migrations
                     PeliculaId = table.Column<int>(type: "INTEGER", nullable: false),
                     Id = table.Column<int>(type: "INTEGER", nullable: false),
                     GeneroId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Disponible = table.Column<int>(type: "INTEGER", nullable: false),
                     Actores = table.Column<string>(type: "TEXT", nullable: false),
                     Foto = table.Column<byte[]>(type: "BLOB", nullable: true),
                     Categoria = table.Column<string>(type: "TEXT", nullable: true),
-                    Descripcion = table.Column<string>(type: "TEXT", nullable: true)
+                    Descripcion = table.Column<string>(type: "TEXT", nullable: true),
+                    PeliculasPeliculaId = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -114,6 +114,11 @@ namespace QueRecomiendas.Server.Migrations
                         principalTable: "Peliculas",
                         principalColumn: "PeliculaId",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PeliculaDetalle_Peliculas_PeliculasPeliculaId",
+                        column: x => x.PeliculasPeliculaId,
+                        principalTable: "Peliculas",
+                        principalColumn: "PeliculaId");
                 });
 
             migrationBuilder.CreateTable(
@@ -161,6 +166,11 @@ namespace QueRecomiendas.Server.Migrations
                 name: "IX_PeliculaDetalle_PeliculaId",
                 table: "PeliculaDetalle",
                 column: "PeliculaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PeliculaDetalle_PeliculasPeliculaId",
+                table: "PeliculaDetalle",
+                column: "PeliculasPeliculaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PeliculasActores_ActorId",

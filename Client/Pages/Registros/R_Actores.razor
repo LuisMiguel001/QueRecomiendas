@@ -1,9 +1,6 @@
 ﻿@page "/R_actores"
 @page "/R_actores/{ActorId:int}"
 @inject HttpClient httpClient
-@inject NavigationManager navigationManager
-
-<h3>Crear Actor</h3>
 
 <EditForm Model="actor" OnValidSubmit="GuardarActor">
 	<DataAnnotationsValidator />
@@ -123,8 +120,6 @@
 				if (response.IsSuccessStatusCode)
 				{
 					actor = new Actores();
-
-					navigationManager.NavigateTo("/pelicula");
 				}
 				else
 				{

@@ -1,71 +1,104 @@
 ﻿@page "/c_actores"
 @inject HttpClient httpClient
 
-<div class="container">
-	<div class="card shadow-lg">
+<div class="card">
+	<div class="card-header">
+		<h3 class="card align-items-center">Actores</h3>
+	</div>
 
-		@*Encabezado*@
-		<div class="card-header">
-			<h3 class="card align-items-center">Actores</h3>
+	<div class="card-body">
+		<form>
+			<div class="input-group mb-3">
+				<input type="text" @bind="FiltroTitulo" class="form-control" placeholder="Buscar por título" />
+				<input type="date" @bind="FechaInicio" class="form-control">
+				<input type="date" @bind="FechaFin" class="form-control" />
+				<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
+					<i class="oi oi-magnifying-glass" />
+				</button>
+				<button @onclick="VaciarCampos" class="btn btn-outline-secondary" type="button">
+					<i class="oi oi-trash" /> Limpiar
+				</button>
+			</div>
+		</form>
+
+		@if (Actor is not null)
+		{
+			<div class="row">
+				@foreach (var actor in Actor)
+				{
+					<div class="col-md-4 mb-4">
+						<div class="card-body text-center">
+							@if (actor.Foto != null)
+							{
+								var base64 = Convert.ToBase64String(actor.Foto);
+								var imgSrc = $"data:image/jpeg;base64,{base64}";
+								<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 100px; height: 100px; margin-right: 5px;" />
+							}
+							<div class="align-content-center">
+								<div class="text-center">
+									<a href="veractores/@actor.Id" class="card-title">@actor.Nombre</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
+
+	<div class="card-footer">
+		<div class="form-row justify-content-sm-between" aria-orientation="vertical">
+			<div class="col-3">
+				<label for="CantidaRegistro" class="col-form-label"><strong>Actores</strong>&nbsp;</label>
+				<input id="CantidaRegistro" @bind-value="@conteo" disabled class="form-control" />
+			</div>
 		</div>
-
-		@if (actores is null)
-		{
-						<p>Cargando...</p>
-		}
-		else
-		{
-			<table class="table">
-				<thead>
-					<tr>
-						<th>ID</th>
-						<th>Foto</th>
-						<th>Nombre</th>
-						<th>Fecha de Nacimiento</th>
-						<th>Biograf&iacute;a</th>
-					</tr>
-				</thead>
-				<tbody>
-					@foreach (var actor in actores)
-					{
-						<tr>
-							<td>@actor.Id</td>
-							<td>
-								@if (actor.Foto != null)
-								{
-									<img src="@($"data:image/png;base64,{Convert.ToBase64String(actor.Foto)}")" alt="Imagen del actor" style="max-width: 100px; max-height: 100px;" />
-								}
-							</td>
-							<td>@actor.Nombre</td>
-							<td>@actor.FechaNacimiento.ToShortDateString()</td>
-							<td>@actor.Biografia</td>
-							<td><a class="btn btn-outline-primary" href="R_actores/@actor.Id">Ver</a></td>
-						</tr>
-					}
-				</tbody>
-			</table>
-		}
-
 	</div>
 </div>
 
 @code {
-	private List<Actores> actores;
+	public string? FiltroTitulo { get; set; }
+	public DateTime? FiltroFecha { get; set; }
+
+	public List<Actores>? Actor { get; set; }
+	public int conteo { get; set; }
+	public DateTime? FechaInicio { get; set; }
+	public DateTime? FechaFin { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		await CargarActores();
+		await Buscar();
 	}
 
-	private async Task CargarActores()
+	public void VaciarCampos()
 	{
-		try
+		FiltroTitulo = "";
+		FechaInicio = DateTime.MinValue;
+		FechaFin = DateTime.MinValue;
+	}
+
+	public async Task Buscar()
+	{
+		Actor = await httpClient.GetFromJsonAsync<List<Actores>>($"api/Actores");
+
+		if (!string.IsNullOrEmpty(FiltroTitulo))
 		{
-			actores = await httpClient.GetFromJsonAsync<List<Actores>>("api/Actores");
+			Actor = Actor
+				.Where(p => string.IsNullOrWhiteSpace(FiltroTitulo) || p.Nombre.IndexOf(FiltroTitulo, StringComparison.OrdinalIgnoreCase) >= 0)
+				.ToList();
 		}
-		catch (Exception ex)
+		else if (FiltroFecha != null)
 		{
-			Console.WriteLine($"Error al cargar los actores: {ex.Message}");
+			Actor = Actor.Where(p => p.FechaNacimiento.Date == FiltroFecha.Value.Date).ToList();
 		}
+		else if (FechaInicio != null && FechaFin != null)
+		{
+			Actor = Actor
+				.Where(p => p.FechaNacimiento.Date >= FechaInicio.Value.Date && p.FechaNacimiento.Date <= FechaFin.Value.Date)
+				.ToList();
+		}
+
+		conteo = Actor != null ? Actor!.Count() : 0;
+		StateHasChanged();
 	}
 }

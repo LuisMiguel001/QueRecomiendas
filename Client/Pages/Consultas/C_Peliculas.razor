@@ -5,7 +5,16 @@
 	<div class="card-header">
 		<h3 class="card align-items-center">Movies</h3>
 	</div>
-
+	<style>
+		.red-card {
+			--card-background-color: #ff0000;
+			--card-text-color: #ffffff;
+			background-color: var(--card-background-color);
+			color: var(--card-text-color);
+			width: 230px;
+			height: 350px;
+		}
+	</style>
 	<div class="card-body">
 		<form>
 			<div class="input-group mb-3">
@@ -27,16 +36,18 @@
 				@foreach (var pelicula in Pelicula)
 				{
 					<div class="col-md-4 mb-4">
-						<div class="card-body text-center">
-							@if (pelicula.Imagen != null)
-							{
-								var base64 = Convert.ToBase64String(pelicula.Imagen);
-								var imgSrc = $"data:image/jpeg;base64,{base64}";
-								<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
-							}
+						<div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
+							<div class="card-body text-center">
+								@if (pelicula.Imagen != null)
+								{
+									var base64 = Convert.ToBase64String(pelicula.Imagen);
+									var imgSrc = $"data:image/jpeg;base64,{base64}";
+									<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
+								}
+							</div>
 							<div class="align-content-center">
 								<div class="text-center">
-									<a href="detallepelicula/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
+									<a href="ver/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
 								</div>
 							</div>
 						</div>
@@ -65,9 +76,20 @@
 	public DateTime? FechaInicio { get; set; }
 	public DateTime? FechaFin { get; set; }
 
+	private string ColorFondo { get; set; }
+	private string TextColor { get; set; }
+
 	protected override async Task OnInitializedAsync()
 	{
+		CambiarColores();
 		await Buscar();
+	}
+
+	private void CambiarColores()
+	{
+		Random random = new Random();
+		ColorFondo = $"#{random.Next(0x1000000):X6}";
+		TextColor = "#ffffff";
 	}
 
 	public void VaciarCampos()

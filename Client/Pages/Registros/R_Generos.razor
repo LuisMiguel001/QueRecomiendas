@@ -1,8 +1,5 @@
 ﻿@page "/R_generos"
 @inject HttpClient httpClient
-@inject NavigationManager navigationManager
-
-<h3>Crear Género</h3>
 
 <EditForm Model="genero" OnValidSubmit="GuardarGenero">
 	<DataAnnotationsValidator />
@@ -72,8 +69,6 @@
 				if (response.IsSuccessStatusCode)
 				{
 					genero = new Generos();
-
-					navigationManager.NavigateTo("/pelicula");
 				}
 				else
 				{

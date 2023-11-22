@@ -1,5 +1,5 @@
-﻿@page "/ver"
-@page "/ver/{PeliculaId:int}"
+﻿@page "/veractores"
+@page "/veractores/{ActorId:int}"
 @inject HttpClient httpClient
 
 <style>
@@ -27,27 +27,26 @@
 			}
 </style>
 
-@if (Pelicula is null)
+@if (Actor is null)
 {
 	<p>Cargando...</p>
 }
 else
 {
 	<div>
-		<h1>@Pelicula.Titulo</h1>
+		<h1>@Actor.Nombre</h1>
 
 		<span>
-				<strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+			<strong>Fecha de Estreno:</strong> @Actor.FechaNacimiento.ToShortDateString()
 		</span>
 
 		<br>
 
-		@if (Pelicula.Imagen != null && Pelicula.Imagen.Length > 0)
+		@if (Actor.Foto != null && Actor.Foto.Length > 0)
 		{
-			var base64Image = Convert.ToBase64String(Pelicula.Imagen);
+			var base64Image = Convert.ToBase64String(Actor.Foto);
 			<div style="display: flex; align-items: center;">
 				<img class="imagen-pelicula" src="data:image/png;base64,@base64Image" alt="Imagen de la película" style="width: 225px; height: 315px; margin-right: 20px;" />
-				<iframe width="560" height="315" src="@($"https://www.youtube.com/embed/{Pelicula.Trailer}")" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 			</div>
 		}
 		<span>
@@ -67,23 +66,23 @@ else
 		</span>
 
 		<div class="detalle-item">
-			<strong>Resumen</strong><br>@Pelicula.Resena
+			<strong>Biogref&iacute;a</strong><br>@Actor.Biografia
 		</div>
 	</div>
 }
 
 @code {
 	[Parameter]
-	public int PeliculaId { get; set; }
-	private Peliculas Pelicula { get; set; }
+	public int ActorId { get; set; }
+	private Actores Actor { get; set; }
 	private PeliculasDetalle PeliculaDetalle { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
-			Pelicula = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{PeliculaId}");
-			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{PeliculaId}");
+			Actor = await httpClient.GetFromJsonAsync<Actores>($"api/Actores/{ActorId}");
+			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{ActorId}");
 		}
 		catch (HttpRequestException e)
 		{

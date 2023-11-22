@@ -34,6 +34,8 @@ public class Peliculas
 
 	public List<GenerosPeliculas> generopeli { get; set; } = new List<GenerosPeliculas>();
 
+	public List<PeliculasDetalle> peliDetalle { get; set; } = new List<PeliculasDetalle>();
+
 	[ForeignKey("PeliculaId")]
 	public ICollection<PeliculasDetalle> peliculaDetalle { get; set; } = new List<PeliculasDetalle>();
 }

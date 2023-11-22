@@ -31,8 +31,8 @@
 						<div class="input-group">
 							<InputFile OnChange="OnChange" class="form-control" accept=".png, .jpg, .jpeg" />
 						</div>
+						<ValidationMessage For="@(() => pelicula.Imagen)" />
 					</div>
-					<ValidationMessage For="@(() => pelicula.Imagen)" />
 					@if (pelicula.Imagen != null)
 					{
 						var base64 = Convert.ToBase64String(pelicula.Imagen);
@@ -206,9 +206,9 @@
 
 	public PeliculasDetalle detalle { get; set; } = new PeliculasDetalle();
 	//public IEnumerable<TipoPeliculas> TiposPeliculasList { get; set; } = Enumerable.Empty<TipoPeliculas>();
-	public IEnumerable<Actores> actoresList { get; set; } = Enumerable.Empty<Actores>();
+	public List<Actores> actoresList { get; set; } = new List<Actores>();
 	public Actores actor { get; set; } = new Actores();
-	public IEnumerable<Generos> generosList { get; set; } = Enumerable.Empty<Generos>();
+	public List<Generos> generosList { get; set; } = new List<Generos>();
 	public Generos genero { get; set; } = new Generos();
 
 	//public List<int> autoresSeleccionados { get; set; } = new List<int>();
@@ -312,6 +312,7 @@
 		}
 		else
 		{
+			Mensaje = "Error";
 			//notificationService.ShowNotification(
 			//	titulo: "error!",
 			//	mensaje: "!Algo salio mal!",

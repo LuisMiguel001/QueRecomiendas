@@ -38,7 +38,7 @@ public class PeliculasController : ControllerBase
 		  .Where(l => l.PeliculaId == id)
 		  .Include(o => o.peliculaDetalle)
 		  .AsNoTracking()
-		  .SingleOrDefault(); ;
+		  .SingleOrDefault(); 
 
 		if (pelicula == null)
 		{
