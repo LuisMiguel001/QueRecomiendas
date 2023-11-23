@@ -86,6 +86,10 @@
 							<InputTextArea @bind-Value="pelicula.Resena" class="form-control"></InputTextArea>
 						</div>
 						<ValidationMessage For="@(() => pelicula.Resena)" />
+						@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 150)
+						{
+							<div class="text-danger">El resumen debe tener al menos 150 palabras.</div>
+						}
 					</div>
 				</div>
 			</div>
@@ -249,10 +253,6 @@
 
 	public async Task Guardar()
 	{
-		foreach (var detalle in pelicula.peliculaDetalle.Where(d => d.PeliculasDetalleId == detalle.PeliculasDetalleId))
-		{
-			await RemoverDetalle(detalle);
-		}
 		using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
 
 		if (response.IsSuccessStatusCode)
@@ -388,5 +388,11 @@
 	{
 		pelicula.peliculaDetalle.Remove(Detalle);
 		await httpClient.DeleteAsync($"api/Peliculas/Detalle/{Detalle.PeliculasDetalleId}");
+	}
+
+	private int ContadorPalabra(string text)
+	{
+		var Contandor = text.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+		return Contandor;
 	}
 }

@@ -34,10 +34,18 @@
 else
 {
 	<div>
-		<h1>@Pelicula.Titulo</h1>
+		<h1>@Pelicula.Titulo (@Pelicula.FechaEstreno.ToString("yyyy"))</h1>
+
+		<strong>Generos:</strong>
+		@foreach (var genero in Pelicula.peliculaDetalle)
+		{
+			<a class="me-2 badge bg-primary rounded-pill text-decoration-none"
+			   href="vergenero?generoid=@genero.GeneroId">@genero.Categoria</a>
+		}
 
 		<span>
-			<strong>Genero:</strong>@PeliculaDetalle.Categoria | <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+			| <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
+			| 
 		</span>
 
 		<br>
@@ -70,20 +78,23 @@ else
 			<strong>Resumen</strong><br>@Pelicula.Resena
 		</div>
 
-		@*<div class="mt-2">
-	<h3>Actores</h3>
-	<div class="d-flex flex-column">
-	@foreach (var actores in Pelicula.peliculaDetalle)
-	{
-	<div class="mb-2">
-	<img style="width: 50px;" src="@actores.Actores" />
-	<span style="display: inline-block; width: 200px">@actores.</span>
-	<span style="display: inline-block; width: 45px">...</span>
-	<span>@actores.Personaje</span>
-	</div>
-	}
-	</div>
-	</div>*@
+		<div class="mt-2">
+			<h3>Actores</h3>
+			<div class="d-flex flex-column">
+				@foreach (var actor in Pelicula.peliculaDetalle)
+				{
+					<div class="mb-2">
+						@if (actor.Foto != null)
+						{
+							var base64 = Convert.ToBase64String(actor.Foto);
+							var imgSrc = $"data:image/jpeg;base64,{base64}";
+							<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 50px;" />
+						}
+						<a href="veractores/@actor.ActorId" class="card-title" style="display: inline-block; width: 200px">@actor.Actores</a>
+					</div>
+				}
+			</div>
+		</div>
 	</div>
 }
 
@@ -91,14 +102,12 @@ else
 	[Parameter]
 	public int PeliculaId { get; set; }
 	private Peliculas Pelicula { get; set; }
-	private PeliculasDetalle PeliculaDetalle { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
 			Pelicula = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{PeliculaId}");
-			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{PeliculaId}");
 		}
 		catch (HttpRequestException e)
 		{

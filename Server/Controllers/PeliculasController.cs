@@ -24,11 +24,14 @@ public class PeliculasController : ControllerBase
 		{
 			return NotFound();
 		}
-		return await _context.Peliculas.ToListAsync();
+		else
+		{
+			return await _context.Peliculas.ToListAsync();
+		}
 	}
 
 	[HttpGet("{id}")]
-	public async Task<ActionResult<Peliculas>> GetPelicula(int id)
+	public async Task<ActionResult<Peliculas>> ObtenerPelicula(int id)
 	{
 		if (_context.Peliculas == null)
 		{
@@ -43,6 +46,11 @@ public class PeliculasController : ControllerBase
 		if (pelicula == null)
 		{
 			return NotFound();
+		}
+
+		foreach (var item in pelicula.peliculaDetalle)
+		{
+			Console.WriteLine($"{item.PeliculasDetalleId}, {item.PeliculaId}, {item.ActorId}, {item.GeneroId}, {item.Actores}, {item.Foto}, {item.Categoria}, {item.Descripcion}");
 		}
 
 		return pelicula;

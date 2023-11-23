@@ -34,10 +34,10 @@
 else
 {
 	<div>
-		<h1>@Actor.Nombre</h1>
+		<h1>@Actor.Nombre (@Actor.FechaNacimiento.ToString("yyyy"))</h1>
 
 		<span>
-			<strong>Fecha de Estreno:</strong> @Actor.FechaNacimiento.ToShortDateString()
+			<strong>Fecha de Nacimiento:</strong> @Actor.FechaNacimiento.ToShortDateString()
 		</span>
 
 		<br>

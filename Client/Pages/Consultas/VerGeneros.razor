@@ -1,0 +1,40 @@
+﻿@page "/vergenero"
+@page "/vergenero/{GeneroId:int}"
+@inject HttpClient httpClient
+
+@if (Genero is null)
+{
+	<p>Cargando...</p>
+}
+else
+{
+	<div>
+		<h1>@Genero.Categoria</h1>
+
+		<br>
+
+		<div class="detalle-item">
+			<strong>Biogref&iacute;a</strong><br>@Genero.Descripcion
+		</div>
+	</div>
+}
+
+@code {
+	[Parameter]
+	public int GeneroId { get; set; }
+	private Generos Genero { get; set; }
+	private PeliculasDetalle PeliculaDetalle { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			Genero = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{GeneroId}");
+			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{GeneroId}");
+		}
+		catch (HttpRequestException e)
+		{
+			Console.WriteLine($"Error al obtener detalles de la película: {e.Message}");
+		}
+	}
+}

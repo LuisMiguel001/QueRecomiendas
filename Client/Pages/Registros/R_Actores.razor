@@ -70,6 +70,10 @@
 							<InputTextArea id="biografia" @bind-Value="actor.Biografia" class="form-control" placeholder="Biograf&iacute;a del Actor" />
 						</div>
 						<ValidationMessage For="@(() => actor.Biografia)" />
+						@if (!string.IsNullOrWhiteSpace(actor.Biografia) && ContadorPalabra(actor.Biografia) < 150)
+						{
+							<div class="text-danger">La Biograf&iacute;a debe tener al menos 150 palabras.</div>
+						}
 					</div>
 				</div>
 
@@ -189,5 +193,11 @@
 	private bool ValidarDatosActor()
 	{
 		return !string.IsNullOrEmpty(actor.Nombre);
+	}
+
+	private int ContadorPalabra(string text)
+	{
+		var Contandor = text.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+		return Contandor;
 	}
 }
