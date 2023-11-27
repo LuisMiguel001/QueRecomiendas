@@ -1,5 +1,7 @@
 ﻿@page "/c_actores"
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
 
 <div class="card">
 	<div class="card-header">

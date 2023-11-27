@@ -1,54 +1,60 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">QueRecomiendas</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="top-row ps-3 navbar navbar-dark">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="">QueRecomiendas</a>
+		<button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+	</div>
 </div>
 
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Pelicula">
-                <span class="oi oi-document" aria-hidden="true"></span> Registrar Pel&iacute;culas
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="R_actores">
-                <span class="oi oi-document" aria-hidden="true"></span> Registrar Actores
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="R_generos">
-                <span class="oi oi-document" aria-hidden="true"></span> Registrar G&eacute;neros
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="c_pelicula">
-                <span class="oi oi-media-play" aria-hidden="true"></span> Movies
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="c_actores">
-                <span class="oi oi-star" aria-hidden="true"></span> Actores
-            </NavLink>
-        </div>
-    </nav>
+	<nav class="flex-column">
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="/Index" Match="NavLinkMatch.All">
+				<span class="oi oi-home" aria-hidden="true"></span> Home
+			</NavLink>
+		</div>
+		<AuthorizeView Roles="Administrador">
+			<Authorized>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="Pelicula">
+						<span class="oi oi-document" aria-hidden="true"></span> Registrar Pel&iacute;culas
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="R_actores">
+						<span class="oi oi-document" aria-hidden="true"></span> Registrar Actores
+					</NavLink>
+				</div>
+				<div class="nav-item px-3">
+					<NavLink class="nav-link" href="R_generos">
+						<span class="oi oi-document" aria-hidden="true"></span> Registrar G&eacute;neros
+					</NavLink>
+				</div>
+			</Authorized>
+		</AuthorizeView>
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="c_pelicula">
+				<span class="oi oi-media-play" aria-hidden="true"></span> Movies
+			</NavLink>
+		</div>
+		<div class="nav-item px-3">
+			<NavLink class="nav-link" href="c_actores">
+				<span class="oi oi-star" aria-hidden="true"></span> Actores
+			</NavLink>
+		</div>
+	</nav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+	private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+	private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+	private void ToggleNavMenu()
+	{
+		collapseNavMenu = !collapseNavMenu;
+	}
 }

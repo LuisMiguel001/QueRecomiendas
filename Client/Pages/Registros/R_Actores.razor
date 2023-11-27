@@ -1,5 +1,7 @@
 ﻿@page "/R_actores"
 @page "/R_actores/{ActorId:int}"
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "Administrador")]
 @inject HttpClient httpClient
 
 <EditForm Model="actor" OnValidSubmit="GuardarActor">

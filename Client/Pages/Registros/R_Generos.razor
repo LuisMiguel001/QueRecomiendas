@@ -1,6 +1,7 @@
 ﻿@page "/R_generos"
 @inject HttpClient httpClient
-
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "Administrador")]
 <EditForm Model="genero" OnValidSubmit="GuardarGenero">
 	<DataAnnotationsValidator />
 

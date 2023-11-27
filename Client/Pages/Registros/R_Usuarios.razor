@@ -1,0 +1,224 @@
+﻿@page "/register"
+@layout LoginLayout
+@inject NotificationService notificationService
+@inject HttpClient httpClient
+@inject NavigationManager navigationManager
+
+<!DOCTYPE html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Log-in Page</title>
+	<style>
+		html, body {
+			background-image: url('https://i.postimg.cc/5tbrjQSL/859126-poster-movie-film-movies-posters.jpg');
+			background-size: cover;
+			height: 100%;
+			font-family: 'Numans', sans-serif;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		section {
+			background-image: url('/bg/10.jpg');
+			background-repeat: no-repeat;
+			background-size: cover;
+			height: 100vh;
+			font-family: 'Poppins', sans-serif;
+		}
+
+		.login-box {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 400px;
+			padding: 40px;
+			margin: 20px auto;
+			transform: translate(-50%, -55%);
+			background: transparent;
+			backdrop-filter: blur(50px);
+			box-sizing: border-box;
+			box-shadow: 0 15px 25px orangered;
+			border-radius: 10px;
+		}
+
+			.login-box p:first-child {
+				margin: 0 0 30px;
+				padding: 0;
+				color: #2f002c;
+				text-align: center;
+				font-size: 1.5rem;
+				font-weight: bold;
+				letter-spacing: 1px;
+			}
+
+			.login-box .user-box {
+				position: relative;
+			}
+
+				.login-box .user-box input {
+					width: 100%;
+					padding: 10px 0;
+					font-size: 16px;
+					color: greenyellow;
+					margin-bottom: 30px;
+					border: none;
+					border-bottom: 1px solid orangered;
+					outline: none;
+					background: transparent;
+				}
+
+				.login-box .user-box label {
+					position: absolute;
+					top: 0;
+					left: 0;
+					padding: 10px 0;
+					font-size: 16px;
+					color: orangered;
+					pointer-events: none;
+					transition: .5s;
+				}
+
+				.login-box .user-box input:focus ~ label,
+				.login-box .user-box input:valid ~ label {
+					top: -20px;
+					left: 0;
+					color: orangered;
+					font-size: 12px;
+				}
+
+			.login-box form a {
+				position: relative;
+				display: inline-block;
+				padding: 10px 20px;
+				font-weight: bold;
+				color: #fff;
+				font-size: 16px;
+				text-decoration: none;
+				text-transform: uppercase;
+				overflow: hidden;
+				transition: .5s;
+				margin-top: 40px;
+				letter-spacing: 3px
+			}
+
+			.login-box a:hover,
+			.login-box button:hover {
+				transform: scale(1.1);
+				box-shadow: 0 0 24px 0;
+				border: 2px solid #FF4500;
+			}
+
+			.login-box button {
+				background-color: transparent;
+				color: orangered;
+				font-weight: bold;
+				font-size: 16px;
+				text-decoration: none;
+				text-transform: uppercase;
+				letter-spacing: 3px;
+				padding: 10px 20px;
+				border: 2px solid transparent;
+				transition: .5s;
+			}
+
+				.login-box button:hover {
+					color: #fff;
+					border-color: orangered;
+				}
+
+	</style>
+</head>
+<div class="row mt-5">
+
+	<div class="login-box">
+
+		<div class="mb-3 text-center" style="color: #FF4500 ; font-size: 1.5rem; font-weight: bold; letter-spacing: 1px;">
+			<h3>Sign Up</h3>
+		</div>
+
+		<div class="user-box">
+			<input @bind="user.Correo" type="email" />
+			<label>Correo</label>
+		</div>
+
+		<div class="user-box">
+			<input @bind="user.Clave" type="password" />
+			<label>Contraseña</label>
+		</div>
+
+		<div class="user-box">
+			<input @bind="ConfirmarClave" type="password" />
+			<label>Confirmar Contraseña</label>
+		</div>
+
+		<div class="mb-3">
+			<button @onclick="RegisterUser" class="btn btn-primary" style="font-weight: bold; background-color: orangered; color: #fff; font-size: 16px; text-decoration: none; text-transform: uppercase; letter-spacing: 3px; padding: 10px 20px; border: none; transition: .5s;">
+				Registrarse
+			</button>
+		</div>
+		<div class="card-footer" style="background-color: transparent;">
+			<div class="d-flex justify-content-center links" style="color: #fff;">
+				 Volver al<a href="/" style="color: #FF4500 ;">Login</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private Usuarios user = new Usuarios();
+	private string ConfirmarClave = string.Empty;
+
+	private async Task RegisterUser()
+	{
+		if (user.Correo == string.Empty || user.Clave == string.Empty || ConfirmarClave == string.Empty)
+		{
+			notificationService.ShowNotification(
+					titulo: "Aviso!",
+					mensaje: "Debe Rellenar Todos Los Campos",
+					NotificationSeverity.Warning
+				);
+		}
+		if (user.Clave != ConfirmarClave)
+		{
+			notificationService.ShowNotification(
+				titulo: "Error!",
+				mensaje: "Las Claves no Coincidieron, Ingreselas Nuevamente",
+				NotificationSeverity.Error
+			);
+			return;
+		}
+
+		var response = await httpClient.PostAsJsonAsync("api/Usuarios/register", user);
+
+		if (response.IsSuccessStatusCode)
+		{
+			notificationService.ShowNotification(
+				titulo: "Exito",
+				mensaje: "La Cuente sea Creado",
+				NotificationSeverity.Success
+			);
+			Nuevo();
+
+		}
+		else
+		{
+			notificationService.ShowNotification(
+					titulo: "Aviso!",
+					mensaje: "La Cuenta Ya Existe",
+					NotificationSeverity.Warning
+				);
+		}
+	}
+
+	public void Nuevo()
+	{
+		this.user = new Usuarios();
+		ConfirmarClave = string.Empty;
+	}
+}

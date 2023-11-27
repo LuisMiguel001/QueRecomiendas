@@ -1,0 +1,194 @@
+﻿@page "/"
+@layout LoginLayout
+@inject NotificationService notificationService
+@inject HttpClient httpClient
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider autenticacionProvider
+@inject NavigationManager navManager
+
+<!DOCTYPE html>
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Log-in Page</title>
+	<style>
+		html, body {
+			background-image: url('https://i.postimg.cc/N02qxDYv/R.jpg');
+			background-size: cover;
+			height: 100%;
+			font-family: 'Numans', sans-serif;
+		}
+
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		section {
+			background-image: url('/bg/10.jpg');
+			background-repeat: no-repeat;
+			background-size: cover;
+			height: 100vh;
+			font-family: 'Poppins', sans-serif;
+		}
+
+		.login-box {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 400px;
+			padding: 40px;
+			margin: 20px auto;
+			transform: translate(-50%, -55%);
+			background: transparent;
+			backdrop-filter: blur(50px);
+			box-sizing: border-box;
+			box-shadow: 0 15px 25px orangered;
+			border-radius: 10px;
+		}
+
+			.login-box p:first-child {
+				margin: 0 0 30px;
+				padding: 0;
+				color: #2f002c;
+				text-align: center;
+				font-size: 1.5rem;
+				font-weight: bold;
+				letter-spacing: 1px;
+			}
+
+			.login-box .user-box {
+				position: relative;
+			}
+
+				.login-box .user-box input {
+					width: 100%;
+					padding: 10px 0;
+					font-size: 16px;
+					color: greenyellow;
+					margin-bottom: 30px;
+					border: none;
+					border-bottom: 1px solid orangered;
+					outline: none;
+					background: transparent;
+				}
+
+				.login-box .user-box label {
+					position: absolute;
+					top: 0;
+					left: 0;
+					padding: 10px 0;
+					font-size: 16px;
+					color: orangered;
+					pointer-events: none;
+					transition: .5s;
+				}
+
+				.login-box .user-box input:focus ~ label,
+				.login-box .user-box input:valid ~ label {
+					top: -20px;
+					left: 0;
+					color: orangered;
+					font-size: 12px;
+				}
+
+			.login-box form a {
+				position: relative;
+				display: inline-block;
+				padding: 10px 20px;
+				font-weight: bold;
+				color: #fff;
+				font-size: 16px;
+				text-decoration: none;
+				text-transform: uppercase;
+				overflow: hidden;
+				transition: .5s;
+				margin-top: 40px;
+				letter-spacing: 3px
+			}
+
+			.login-box a:hover,
+			.login-box button:hover {
+				transform: scale(1.1);
+				box-shadow: 0 0 24px 0;
+				border: 2px solid #FF4500;
+			}
+
+			.login-box button {
+				background-color: transparent;
+				color: orangered;
+				font-weight: bold;
+				font-size: 16px;
+				text-decoration: none;
+				text-transform: uppercase;
+				letter-spacing: 3px;
+				padding: 10px 20px;
+				border: 2px solid transparent;
+				transition: .5s;
+			}
+
+				.login-box button:hover {
+					color: #fff;
+					border-color: orangered;
+				}
+
+	</style>
+</head>
+
+<div class="row mt-5">
+
+	<div class="login-box">
+
+		<div class="mb-3 text-center" style="color: #FF4500 ; font-size: 1.5rem; font-weight: bold; letter-spacing: 1px;">
+			<h3>Sign In</h3>
+		</div>
+
+		<div class="user-box">
+			<input @bind="login.Correo" type="email" />
+			<label>Correo</label>
+		</div>
+
+		<div class="user-box">
+			<input @bind="login.Clave" type="password" />
+			<label>Contraseña</label>
+		</div>
+
+		<div class="mb-3">
+			<button @onclick="IniciarSesion" class="btn btn-primary" style="font-weight: bold; background-color: orangered; color: #fff; font-size: 16px; text-decoration: none; text-transform: uppercase; letter-spacing: 3px; padding: 10px 20px; border: none; transition: .5s;">
+				Iniciar Sesi&oacute;n
+			</button>
+		</div>
+		<div class="card-footer" style="background-color: transparent;">
+			<div class="d-flex justify-content-center links" style="color: #fff;">
+				Crear Cuenta <a href="/register" style="color: #FF4500 ;">Registrarse</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+	private Usuarios login = new Usuarios();
+
+	private async Task IniciarSesion()
+	{
+		var loginResponse = await httpClient.PostAsJsonAsync<Usuarios>("/api/Usuarios/Login", login);
+		if (loginResponse.IsSuccessStatusCode)
+		{
+			var sesionUsuario = await loginResponse.Content.ReadFromJsonAsync<Sesion>();
+			var autenticacionExt = (AutenticacionExtension)autenticacionProvider;
+			await autenticacionExt.ActualizarEstadoAutenticacion(sesionUsuario);
+
+			navManager.NavigateTo("/Index");
+		}
+		else
+		{
+			notificationService.ShowNotification(
+				titulo: "Aviso",
+				mensaje: "Debe Rellenar Bien Las Credenciales",
+				NotificationSeverity.Error
+			);
+		}
+	}
+}

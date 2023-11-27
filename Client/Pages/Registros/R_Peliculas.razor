@@ -1,6 +1,8 @@
 ﻿@page "/Pelicula"
 @page "/Pelicula/{PeliculaId:int}"
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "Administrador")]
 
 <EditForm Model="pelicula" OnValidSubmit="Guardar">
 	<DataAnnotationsValidator />
@@ -138,6 +140,7 @@
 							<th>Pelicula ID</th>
 							<th>Genero</th>
 							<th>Actor</th>
+							<th>Foto</th>
 						</tr>
 					</thead>
 
@@ -148,27 +151,16 @@
 								<td>@item.GeneroId</td>
 								<td>@ObtenerDescripcion(item.GeneroId)</td>
 								<td>@item.Actores</td>
+								<td>
+									@{
+										var base64 = Convert.ToBase64String(item.Foto);
+										var imgSrc = $"data:image/jpeg;base64,{base64}";
+										<img src="@imgSrc" alt="Imagen de la película" class="img-fluid img-thumbnail" style="max-width: 75px; max-height: 75px;" />
+									}
+								</td>
 								<td><button type="button" class="btn btn-outline-danger" @onclick=@(() => RemoverDetalle(item))><i class="oi oi-trash" /></button></td>
 							</tr>
 						}
-						@*foreach (var itemn in this.actoresList)
-						{
-						<tr>
-						<td>@itemn.Nombre</td>
-						<td>
-						@if (itemn.Foto != null && itemn.Foto.Length > 0)
-						{
-						var base64 = Convert.ToBase64String(itemn.Foto);
-						var imgSrc = $"data:image/jpeg;base64,{base64}";
-						<img src="@imgSrc" alt="Imagen de la película" class="img-fluid img-thumbnail" style="max-width: 75px; max-height: 75px;" />
-						}
-						else
-						{
-						<p>la imagen está vacía</p>
-						}
-						</td>
-						</tr>
-						}*@
 					</tbody>
 				</table>
 				<hr />

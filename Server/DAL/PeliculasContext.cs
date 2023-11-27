@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using QueRecomiendas.Shared.Login;
 using QueRecomiendas.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace QueRecomiendas.Server.DAL
 		public DbSet<PeliculasActores> PeliculasActores { get; set; }
 		public DbSet<Generos> Generos { get; set; }
 		public DbSet<GenerosPeliculas> GenerosPeliculas { get; set; }
+		public DbSet<Usuarios> Usuarios { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

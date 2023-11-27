@@ -26,7 +26,7 @@ public class GenerosController : ControllerBase
 	}
 
 	[HttpGet("{id}")]
-	public async Task<ActionResult<Generos>> GetGeneroPelicula(int id)
+	public async Task<ActionResult<Generos>> ObtenerGeneroPelicula(int id)
 	{
 		var genero = await _context.Generos.FindAsync(id);
 

@@ -1,6 +1,8 @@
 ﻿@page "/vergenero"
 @page "/vergenero/{GeneroId:int}"
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
 
 @if (Genero is null)
 {
@@ -9,12 +11,12 @@
 else
 {
 	<div>
-		<h1>@Genero.Categoria</h1>
+		<strong style="font-size: 30px;">G&eacute;nero: </strong><strong style="font-size: 20px;">(@Genero.Categoria)</strong>
 
 		<br>
 
 		<div class="detalle-item">
-			<strong>Biogref&iacute;a</strong><br>@Genero.Descripcion
+			<strong style="font-size: 20px;">Descripci&oacute;n:</strong><br>@Genero.Descripcion
 		</div>
 	</div>
 }
@@ -23,14 +25,12 @@ else
 	[Parameter]
 	public int GeneroId { get; set; }
 	private Generos Genero { get; set; }
-	private PeliculasDetalle PeliculaDetalle { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
 			Genero = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{GeneroId}");
-			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{GeneroId}");
 		}
 		catch (HttpRequestException e)
 		{

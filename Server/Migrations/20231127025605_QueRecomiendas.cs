@@ -60,6 +60,20 @@ namespace QueRecomiendas.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Usuarios",
+                columns: table => new
+                {
+                    UsuarioId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Correo = table.Column<string>(type: "TEXT", nullable: false),
+                    Clave = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Usuarios", x => x.UsuarioId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GenerosPeliculas",
                 columns: table => new
                 {
@@ -183,6 +197,9 @@ namespace QueRecomiendas.Server.Migrations
 
             migrationBuilder.DropTable(
                 name: "PeliculasActores");
+
+            migrationBuilder.DropTable(
+                name: "Usuarios");
 
             migrationBuilder.DropTable(
                 name: "Generos");

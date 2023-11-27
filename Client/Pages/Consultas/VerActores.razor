@@ -1,7 +1,8 @@
 ﻿@page "/veractores"
 @page "/veractores/{ActorId:int}"
 @inject HttpClient httpClient
-
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
 <style>
 	p.clasificacion {
 		position: relative;
@@ -75,14 +76,12 @@ else
 	[Parameter]
 	public int ActorId { get; set; }
 	private Actores Actor { get; set; }
-	private PeliculasDetalle PeliculaDetalle { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
 		try
 		{
 			Actor = await httpClient.GetFromJsonAsync<Actores>($"api/Actores/{ActorId}");
-			PeliculaDetalle = await httpClient.GetFromJsonAsync<PeliculasDetalle>($"api/Generos/{ActorId}");
 		}
 		catch (HttpRequestException e)
 		{

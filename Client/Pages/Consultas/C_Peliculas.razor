@@ -1,61 +1,75 @@
 ﻿@page "/c_pelicula"
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
 
 <div class="card">
-	<div class="card-header">
-		<h3 class="card align-items-center">Movies</h3>
-	</div>
-	<style>
-		.red-card {
-			--card-background-color: #ff0000;
-			--card-text-color: #ffffff;
-			background-color: var(--card-background-color);
-			color: var(--card-text-color);
-			width: 230px;
-			height: 350px;
-		}
-	</style>
-	<div class="card-body">
-		<form>
-			<div class="input-group mb-3">
-				<input type="text" @bind="FiltroTitulo" class="form-control" placeholder="Buscar por título" />
-				<input type="date" @bind="FechaInicio" class="form-control">
-				<input type="date" @bind="FechaFin" class="form-control" />
-				<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
-					<i class="oi oi-magnifying-glass" />
-				</button>
-				<button @onclick="VaciarCampos" class="btn btn-outline-secondary" type="button">
-					<i class="oi oi-trash" /> Limpiar
-				</button>
-			</div>
-		</form>
+    <div class="card-header">
+        <h3 class="card align-items-center">Movies</h3>
+    </div>
+    <style>
+        .red-card {
+            --card-background-color: #ff0000;
+            --card-text-color: #ffffff;
+            background-color: var(--card-background-color);
+            color: var(--card-text-color);
+            width: 230px;
+            height: 350px;
+        }
+    </style>
+    <div class="card-body">
 
-		@if (Pelicula is not null)
-		{
-			<div class="row">
-				@foreach (var pelicula in Pelicula)
-				{
-					<div class="col-md-4 mb-4">
-						<div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
-							<div class="card-body text-center">
-								@if (pelicula.Imagen != null)
-								{
-									var base64 = Convert.ToBase64String(pelicula.Imagen);
-									var imgSrc = $"data:image/jpeg;base64,{base64}";
-									<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
-								}
-							</div>
-							<div class="align-content-center">
-								<div class="text-center">
-									<a href="ver/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				}
-			</div>
-		}
-	</div>
+        <h4>En Carteleras</h4>
+        @if (Pelicula is not null)
+        {
+            <div class="row">
+                @foreach (var pelicula in PeliculaPasadas)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
+                            <div class="card-body text-center">
+                                @if (pelicula.Imagen != null)
+                                {
+                                    var base64 = Convert.ToBase64String(pelicula.Imagen);
+                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
+                                    <img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
+                                }
+                            </div>
+                            <div class="align-content-center">
+                                <div class="text-center">
+                                    <a href="ver/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <h4>Pr&oacute;ximos Estrenos</h4>
+            <div class="row">
+                @foreach (var pelicula in PeliculaFuturas)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
+                            <div class="card-body text-center">
+                                @if (pelicula.Imagen != null)
+                                {
+                                    var base64 = Convert.ToBase64String(pelicula.Imagen);
+                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
+                                    <img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
+                                }
+                            </div>
+                            <div class="align-content-center">
+                                <div class="text-center">
+                                    <a href="ver/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 
 	<div class="card-footer">
 		<div class="form-row justify-content-sm-between" aria-orientation="vertical">
@@ -78,6 +92,9 @@
 
 	private string ColorFondo { get; set; }
 	private string TextColor { get; set; }
+
+	public List<Peliculas> PeliculaPasadas { get; set; }
+	public List<Peliculas> PeliculaFuturas { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -103,24 +120,20 @@
 	{
 		Pelicula = await httpClient.GetFromJsonAsync<List<Peliculas>>($"api/Peliculas");
 
-		if (!string.IsNullOrEmpty(FiltroTitulo))
+		if (Pelicula != null)
 		{
-			Pelicula = Pelicula
-				.Where(p => string.IsNullOrWhiteSpace(FiltroTitulo) || p.Titulo.IndexOf(FiltroTitulo, StringComparison.OrdinalIgnoreCase) >= 0)
+			DateTime fechaHoy = DateTime.Now.Date;
+
+			PeliculaPasadas = Pelicula
+				.Where(p => p.FechaEstreno.Date < fechaHoy)
 				.ToList();
-		}
-		else if (FiltroFecha != null)
-		{
-			Pelicula = Pelicula.Where(p => p.FechaEstreno.Date == FiltroFecha.Value.Date).ToList();
-		}
-		else if (FechaInicio != null && FechaFin != null)
-		{
-			Pelicula = Pelicula
-				.Where(p => p.FechaEstreno.Date >= FechaInicio.Value.Date && p.FechaEstreno.Date <= FechaFin.Value.Date)
+
+			PeliculaFuturas = Pelicula
+				.Where(p => p.FechaEstreno.Date >= fechaHoy)
 				.ToList();
 		}
 
-		conteo = Pelicula != null ? Pelicula!.Count() : 0;
+		conteo = Pelicula != null ? Pelicula.Count() : 0;
 		StateHasChanged();
 	}
 }

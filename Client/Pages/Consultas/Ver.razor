@@ -1,6 +1,8 @@
 ﻿@page "/ver"
 @page "/ver/{PeliculaId:int}"
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
 
 <style>
 	p.clasificacion {
@@ -40,7 +42,7 @@ else
 		@foreach (var genero in Pelicula.peliculaDetalle)
 		{
 			<a class="me-2 badge bg-primary rounded-pill text-decoration-none"
-			   href="vergenero?generoid=@genero.GeneroId">@genero.Categoria</a>
+			   href="vergenero/@genero.GeneroId">@genero.Categoria</a>
 		}
 
 		<span>
@@ -55,7 +57,7 @@ else
 			var base64Image = Convert.ToBase64String(Pelicula.Imagen);
 			<div style="display: flex; align-items: center;">
 				<img class="imagen-pelicula" src="data:image/png;base64,@base64Image" alt="Imagen de la película" style="width: 225px; height: 315px; margin-right: 20px;" />
-				<iframe width="560" height="315" src="@($"https://www.youtube.com/embed/{Pelicula.Trailer}")" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/@Pelicula.Trailer" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 			</div>
 		}
 		<span>
