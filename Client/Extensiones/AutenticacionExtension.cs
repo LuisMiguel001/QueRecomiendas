@@ -21,12 +21,14 @@ namespace QueRecomiendas.Client.Extensiones
 
 			if (sesionUsuario != null)
 			{
-				claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
+				var claims = new List<Claim>
 				{
-					new Claim(ClaimTypes.Name,sesionUsuario.Nombre),
-					new Claim(ClaimTypes.Email,sesionUsuario.Correo),
-					new Claim(ClaimTypes.Role,sesionUsuario.Rol)
-				}, "JwtAuth"));
+					new Claim(ClaimTypes.Name, sesionUsuario.Nombre ?? ""),
+					new Claim(ClaimTypes.Email, sesionUsuario.Correo ?? ""),
+					new Claim(ClaimTypes.Role, sesionUsuario.Rol ?? "")
+				};
+
+				claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "JwtAuth"));
 
 				await _sessionStorage.GuardarStorage("sesionUsuario", sesionUsuario);
 			}
@@ -37,8 +39,8 @@ namespace QueRecomiendas.Client.Extensiones
 			}
 
 			NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
-
 		}
+
 
 
 		public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -47,15 +49,18 @@ namespace QueRecomiendas.Client.Extensiones
 			var sesionUsuario = await _sessionStorage.ObtenerStorage<Sesion>("sesionUsuario");
 
 			if (sesionUsuario == null)
+			{
 				return await Task.FromResult(new AuthenticationState(_sinInformacion));
+			}
 
-			var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new List<Claim>
-				{
-					new Claim(ClaimTypes.Name,sesionUsuario.Nombre),
-					new Claim(ClaimTypes.Email,sesionUsuario.Correo),
-					new Claim(ClaimTypes.Role,sesionUsuario.Rol)
-				}, "JwtAuth"));
+			var claims = new List<Claim>
+			{
+				new Claim(ClaimTypes.Name, sesionUsuario.Nombre ?? ""),
+				new Claim(ClaimTypes.Email, sesionUsuario.Correo ?? ""),
+				new Claim(ClaimTypes.Role, sesionUsuario.Rol ?? "")
+			};
 
+			var claimPrincipal = new ClaimsPrincipal(new ClaimsIdentity(claims, "JwtAuth"));
 
 			return await Task.FromResult(new AuthenticationState(claimPrincipal));
 		}

@@ -4,72 +4,90 @@
 @attribute [Authorize]
 
 <div class="card">
-    <div class="card-header">
-        <h3 class="card align-items-center">Movies</h3>
-    </div>
-    <style>
-        .red-card {
-            --card-background-color: #ff0000;
-            --card-text-color: #ffffff;
-            background-color: var(--card-background-color);
-            color: var(--card-text-color);
-            width: 230px;
-            height: 350px;
-        }
-    </style>
-    <div class="card-body">
+	<div class="card-header">
+		<h3 class="card align-items-center">Movies</h3>
+	</div>
+	<style>
+		.red-card {
+			--card-background-color: #ff0000;
+			--card-text-color: #ffffff;
+			background-color: var(--card-background-color);
+			color: var(--card-text-color);
+			width: 230px;
+			height: 350px;
+		}
+	</style>
+	<div class="card-body">
+		<div class="card-body">
+			<form>
+				<div class="input-group mb-3">
+					<input type="text" @bind="Titulo" class="form-control" placeholder="Título" />
+					<input type="date" @bind="FechaInicioFiltro" class="form-control" />
+					<input type="date" @bind="FechaFinFiltro" class="form-control" />
+					<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
+						<i class="oi oi-magnifying-glass" />
+					</button>
+					<button @onclick="VaciarCampos" class="btn btn-outline-secondary" type="button">
+						<i class="oi oi-trash" /> Limpiar
+					</button>
+				</div>
+			</form>
+		</div>
+		<h4>En Carteleras</h4>
+		@if (Pelicula is not null)
+		{
+			<div class="row">
+				@foreach (var pelicula in PeliculaPasadas)
+				{
+					<div class="col-md-4 mb-4">
+						<div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
+							<div class="card-body text-center">
+								@if (pelicula.Imagen != null)
+								{
+									var base64 = Convert.ToBase64String(pelicula.Imagen);
+									var imgSrc = $"data:image/jpeg;base64,{base64}";
+									<a href="ver/@pelicula.PeliculaId">
+										<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
+									</a>
+								}
+							</div>
+							<div class="align-content-center">
+								<div class="text-center">
+									<strong style="color: blue">@pelicula.Titulo</strong>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
 
-        <h4>En Carteleras</h4>
-        @if (Pelicula is not null)
-        {
-            <div class="row">
-                @foreach (var pelicula in PeliculaPasadas)
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
-                            <div class="card-body text-center">
-                                @if (pelicula.Imagen != null)
-                                {
-                                    var base64 = Convert.ToBase64String(pelicula.Imagen);
-                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
-                                    <img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
-                                }
-                            </div>
-                            <div class="align-content-center">
-                                <div class="text-center">
-                                    <a href="ver/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <h4>Pr&oacute;ximos Estrenos</h4>
-            <div class="row">
-                @foreach (var pelicula in PeliculaFuturas)
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
-                            <div class="card-body text-center">
-                                @if (pelicula.Imagen != null)
-                                {
-                                    var base64 = Convert.ToBase64String(pelicula.Imagen);
-                                    var imgSrc = $"data:image/jpeg;base64,{base64}";
-                                    <img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
-                                }
-                            </div>
-                            <div class="align-content-center">
-                                <div class="text-center">
-                                    <a href="ver/@pelicula.PeliculaId" class="card-title">@pelicula.Titulo</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
+			<h4>Pr&oacute;ximos Estrenos</h4>
+			<div class="row">
+				@foreach (var pelicula in PeliculaFuturas)
+				{
+					<div class="col-md-4 mb-4">
+						<div class="card red-card" style="background-color: @ColorFondo; color: @TextColor;">
+							<div class="card-body text-center">
+								@if (pelicula.Imagen != null)
+								{
+									var base64 = Convert.ToBase64String(pelicula.Imagen);
+									var imgSrc = $"data:image/jpeg;base64,{base64}";
+									<a href="ver/@pelicula.PeliculaId">
+										<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 225px; height: 315px; margin-right: 20px;" />
+									</a>
+								}
+							</div>
+							<div class="align-content-center">
+								<div class="text-center">
+									<strong style="color: blue">@pelicula.Titulo</strong>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
 
 	<div class="card-footer">
 		<div class="form-row justify-content-sm-between" aria-orientation="vertical">
@@ -82,13 +100,13 @@
 </div>
 
 @code {
-	public string? FiltroTitulo { get; set; }
+	public string? Titulo { get; set; }
 	public DateTime? FiltroFecha { get; set; }
 
 	public List<Peliculas>? Pelicula { get; set; }
 	public int conteo { get; set; }
-	public DateTime? FechaInicio { get; set; }
-	public DateTime? FechaFin { get; set; }
+	public DateTime? FechaInicioFiltro { get; set; }
+	public DateTime? FechaFinFiltro { get; set; }
 
 	private string ColorFondo { get; set; }
 	private string TextColor { get; set; }
@@ -111,15 +129,33 @@
 
 	public void VaciarCampos()
 	{
-		FiltroTitulo = "";
-		FechaInicio = DateTime.MinValue;
-		FechaFin = DateTime.MinValue;
+		Titulo = "";
+		FechaInicioFiltro = DateTime.MinValue;
+		FechaFinFiltro = DateTime.MinValue;
 	}
 
 	public async Task Buscar()
 	{
 		Pelicula = await httpClient.GetFromJsonAsync<List<Peliculas>>($"api/Peliculas");
+		if (!string.IsNullOrEmpty(Titulo))
+		{
+			Pelicula = Pelicula
+				.Where(p => string.IsNullOrWhiteSpace(Titulo) || p.Titulo.IndexOf(Titulo, StringComparison.OrdinalIgnoreCase) >= 0)
+				.ToList();
+		}
+		if (FechaInicioFiltro.HasValue)
+		{
+			Pelicula = Pelicula
+				.Where(p => p.FechaEstreno.Date >= FechaInicioFiltro.Value.Date)
+				.ToList();
+		}
 
+		if (FechaFinFiltro.HasValue)
+		{
+			Pelicula = Pelicula
+				.Where(p => p.FechaEstreno.Date <= FechaFinFiltro.Value.Date)
+				.ToList();
+		}
 		if (Pelicula != null)
 		{
 			DateTime fechaHoy = DateTime.Now.Date;

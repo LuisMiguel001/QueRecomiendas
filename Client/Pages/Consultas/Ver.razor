@@ -1,7 +1,10 @@
 ﻿@page "/ver"
 @page "/ver/{PeliculaId:int}"
 @inject HttpClient httpClient
-@using Microsoft.AspNetCore.Authorization;
+@inject AuthenticationStateProvider authenticationStateProvider
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
 @attribute [Authorize]
 
 <style>
@@ -47,7 +50,7 @@ else
 
 		<span>
 			| <strong>Fecha de Estreno:</strong> @Pelicula.FechaEstreno.ToShortDateString()
-			| 
+			|
 		</span>
 
 		<br>
@@ -57,7 +60,7 @@ else
 			var base64Image = Convert.ToBase64String(Pelicula.Imagen);
 			<div style="display: flex; align-items: center;">
 				<img class="imagen-pelicula" src="data:image/png;base64,@base64Image" alt="Imagen de la película" style="width: 225px; height: 315px; margin-right: 20px;" />
-				<iframe width="560" height="315" src="https://www.youtube.com/embed/@Pelicula.Trailer" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+				<iframe width="560" height="315" src="https://www.youtube.com/embed/@(ObtenerIDVideo(Pelicula.Trailer))" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 			</div>
 		}
 		<span>
@@ -116,4 +119,16 @@ else
 			Console.WriteLine($"Error al obtener detalles de la película: {e.Message}");
 		}
 	}
+
+	public string ObtenerIDVideo(string trailer)
+	{
+		if (!string.IsNullOrWhiteSpace(trailer) && trailer.Contains("https://www.youtube.com/watch?v="))
+		{
+			var VideoId = trailer.Replace("https://www.youtube.com/watch?v=", "");
+			return VideoId;
+		}
+
+		return string.Empty;
+	}
+
 }

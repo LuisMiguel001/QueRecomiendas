@@ -11,7 +11,7 @@ using QueRecomiendas.Server.DAL;
 namespace QueRecomiendas.Server.Migrations
 {
     [DbContext(typeof(PeliculasContext))]
-    [Migration("20231127025605_QueRecomiendas")]
+    [Migration("20231203005825_QueRecomiendas")]
     partial class QueRecomiendas
     {
         /// <inheritdoc />

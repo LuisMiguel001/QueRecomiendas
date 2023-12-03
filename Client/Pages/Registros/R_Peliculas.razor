@@ -3,6 +3,7 @@
 @inject HttpClient httpClient
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize(Roles = "Administrador")]
+@inject NotificationService notificationService
 
 <EditForm Model="pelicula" OnValidSubmit="Guardar">
 	<DataAnnotationsValidator />
@@ -20,7 +21,7 @@
 				<div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
 					<div class="input-group mb-3">
 						<span class="input-group-text">Buscar</span>
-						<InputNumber @bind-Value="pelicula.PeliculaId" class="form-control" aria-describedby="buscarButton" />
+						<InputNumber @bind-Value="pelicula.PeliculaId" class="form-control" aria-describedby="buscarButton" Min="0" />
 						<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
 							<i class="oi oi-magnifying-glass" />
 						</button>
@@ -88,9 +89,9 @@
 							<InputTextArea @bind-Value="pelicula.Resena" class="form-control"></InputTextArea>
 						</div>
 						<ValidationMessage For="@(() => pelicula.Resena)" />
-						@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 150)
+						@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 100)
 						{
-							<div class="text-danger">El resumen debe tener al menos 150 palabras.</div>
+							<div class="text-danger">El resumen debe tener al menos 100 palabras.</div>
 						}
 					</div>
 				</div>
@@ -115,7 +116,7 @@
 						<ValidationMessage For="@(() => detalle.GeneroId)" />
 					</div>
 
-					@* Autores *@
+					@*Autores*@
 					<div class="col-md-6">
 						<label>Actores:</label>
 						<div class="input-group">
@@ -137,8 +138,9 @@
 				<table class="table table-bordered table-light m-1">
 					<thead class="thead">
 						<tr class="table">
-							<th>Pelicula ID</th>
-							<th>Genero</th>
+							<th>G&eacute;nero ID</th>
+							<th>G&eacute;nero</th>
+							<th>Autor ID</th>
 							<th>Actor</th>
 							<th>Foto</th>
 						</tr>
@@ -150,6 +152,7 @@
 							<tr>
 								<td>@item.GeneroId</td>
 								<td>@ObtenerDescripcion(item.GeneroId)</td>
+								<td>@item.ActorId</td>
 								<td>@item.Actores</td>
 								<td>
 									@{
@@ -235,80 +238,80 @@
 		}
 		else
 		{
-			//notificationService.ShowNotification(
-			//		titulo: "Error de búsqueda",
-			//		mensaje: "Registro no encontrado",
-			//		NotificationSeverity.Error
-			//);
+			notificationService.ShowNotification(
+					titulo: "Error de búsqueda",
+					mensaje: "Registro no encontrado",
+					NotificationSeverity.Error
+			);
 		}
 	}
 
 	public async Task Guardar()
 	{
-		using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
-
-		if (response.IsSuccessStatusCode)
+		if (Validar())
 		{
-			var peliculaDevuelta = await response.Content.ReadFromJsonAsync<Peliculas>();
+			using var response = await httpClient.PostAsJsonAsync("api/Peliculas", pelicula);
 
-			if (peliculaDevuelta is not null)
+			if (response.IsSuccessStatusCode)
 			{
-				this.pelicula = peliculaDevuelta;
-				Nuevo();
-				//this.pelicula.peliActor = autoresSeleccionados.Select(actorId => new PeliculasActores { ActorId = actorId }).ToList();
-				//notificationService.ShowNotification(
-				//	titulo: "Exito",
-				//	mensaje: "Registro guardado",
-				//	NotificationSeverity.Success
-				//);
+				var peliculaDevuelta = await response.Content.ReadFromJsonAsync<Peliculas>();
+
+				if (peliculaDevuelta is not null)
+				{
+					this.pelicula = peliculaDevuelta;
+					Nuevo();
+					notificationService.ShowNotification(
+						titulo: "Exito",
+						mensaje: "Película Guardado",
+						NotificationSeverity.Success
+					);
+				}
+				else
+				{
+					notificationService.ShowNotification(
+						titulo: "Error!",
+						mensaje: "El Película no se guardo",
+						NotificationSeverity.Error
+					);
+				}
 			}
 			else
 			{
-				//notificationService.ShowNotification(
-				//	titulo: "error!",
-				//	mensaje: "El Registro no se guardo",
-				//	NotificationSeverity.Error
-				//);
+				notificationService.ShowNotification(
+					titulo: "Error!",
+					mensaje: "!Algo salio mal!",
+					NotificationSeverity.Error
+				);
 			}
 		}
 		else
 		{
-			Mensaje = "Error";
-			//notificationService.ShowNotification(
-			//	titulo: "error!",
-			//	mensaje: "!Algo salio mal!",
-			//	NotificationSeverity.Error
-			//);
+			notificationService.ShowNotification(
+					titulo: "Verificar!",
+					mensaje: "Algo salio mal al guardar",
+					NotificationSeverity.Error
+				);
 		}
-
 	}
 
 	public void Nuevo()
 	{
 		this.pelicula = new Peliculas();
 		this.detalle = new PeliculasDetalle();
-		Mensaje = string.Empty;
+		notificationService.ShowNotification(
+			titulo: "Nuevo",
+			mensaje: "Registro Nuevo",
+			NotificationSeverity.Info
+		);
 	}
 
 	public bool Validar()
 	{
-		if (string.IsNullOrEmpty(pelicula.Titulo) || pelicula.PeliculaId < 0)
+		@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 100)
 		{
 			return false;
 		}
-		if (pelicula.FechaEstreno != DateTime.Today)
-		{
-			//notificationService.ShowNotification(
-			//	titulo: "Aviso!",
-			//	mensaje: "La fecha debe ser la actual",
-			//	NotificationSeverity.Warning
-			//);
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		return true;
 	}
 
 	public async Task Eliminar()
@@ -317,57 +320,60 @@
 
 		if (!response.IsSuccessStatusCode)
 		{
-			//notificationService.ShowNotification(
-			//	titulo: "Error!",
-			//	mensaje: "No se pudo eliminar!",
-			//	NotificationSeverity.Error
-			//);
+			notificationService.ShowNotification(
+				titulo: "Error!",
+				mensaje: "No se pudo eliminar!",
+				NotificationSeverity.Error
+			);
 			return;
 		}
 		else
 		{
 			Nuevo();
-			//notificationService.ShowNotification(
-			//	titulo: "Eliminado",
-			//	mensaje: "Se ha eliminado Correctamente",
-			//	NotificationSeverity.Success
-			//);
+			notificationService.ShowNotification(
+				titulo: "Eliminado",
+				mensaje: "Se ha eliminado Correctamente",
+				NotificationSeverity.Success
+			);
 		}
 
 	}
 
 	public bool ValidarDetalle()
 	{
-		//if (detalle.TipoPeliculaId <= 0 || string.IsNullOrEmpty(detalle.Actores))
-		//{
-		//	//notificationService.ShowNotification(
-		//	//	titulo: "Aviso!",
-		//	//	mensaje: "Asegúrese de rellenar todos los campos del detalle!",
-		//	//	NotificationSeverity.Warning
-		//	//);
-		//	return false;
-		//}
+		if (detalle.GeneroId <= 0 || detalle.ActorId <= 0)
+		{
+			notificationService.ShowNotification(
+				titulo: "Aviso!",
+				mensaje: "Asegúrese de rellenar todos los campos del detalle!",
+				NotificationSeverity.Warning
+			);
+			return false;
+		}
 
 		return true;
 	}
 
 	public async Task AgregarDetalle()
 	{
-		var actor = actoresList.FirstOrDefault(a => a.ActorId == detalle.ActorId);
-		var genero = generosList.FirstOrDefault(a => a.GeneroId == detalle.GeneroId);
-
-		if (actor != null && genero != null)
+		if (ValidarDetalle())
 		{
-			detalle.Foto = actor.Foto;
-			detalle.Actores = actor.Nombre;
-			detalle.ActorId = actor.ActorId;
-			detalle.Categoria = genero.Categoria;
-			detalle.Descripcion = genero.Descripcion;
-			detalle.GeneroId = genero.GeneroId;
+			var actor = actoresList.FirstOrDefault(a => a.ActorId == detalle.ActorId);
+			var genero = generosList.FirstOrDefault(a => a.GeneroId == detalle.GeneroId);
 
-			detalle.PeliculaId = this.pelicula.PeliculaId;
-			this.pelicula.peliculaDetalle.Add(detalle);
-			detalle = new PeliculasDetalle();
+			if (actor != null && genero != null)
+			{
+				detalle.Foto = actor.Foto;
+				detalle.Actores = actor.Nombre;
+				detalle.ActorId = actor.ActorId;
+				detalle.Categoria = genero.Categoria;
+				detalle.Descripcion = genero.Descripcion;
+				detalle.GeneroId = genero.GeneroId;
+
+				detalle.PeliculaId = this.pelicula.PeliculaId;
+				this.pelicula.peliculaDetalle.Add(detalle);
+				detalle = new PeliculasDetalle();
+			}
 		}
 	}
 
