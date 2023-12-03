@@ -78,9 +78,14 @@
 		{
 			var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
 
-			if (response.IsSuccessStatusCode)
+			if (!response.IsSuccessStatusCode)
 			{
-				genero = new Generos();
+				notificationService.ShowNotification(
+					titulo: "Exito!",
+					mensaje: "Se Guardo Correctamente!",
+					NotificationSeverity.Success
+				);
+				Nuevo();
 			}
 			else
 			{
@@ -104,14 +109,25 @@
 
 	public async Task Buscar()
 	{
-		var generoEncotrado = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{genero.GeneroId}");
-
-		if (generoEncotrado != null)
+		try
 		{
-			this.genero = generoEncotrado;
-			StateHasChanged();
+			var generoEncontrado = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{genero.GeneroId}");
+
+			if (generoEncontrado != null)
+			{
+				this.genero = generoEncontrado;
+				StateHasChanged();
+			}
+			else
+			{
+				notificationService.ShowNotification(
+					titulo: "Error de Búsqueda",
+					mensaje: "Género no Encontrado",
+					NotificationSeverity.Error
+				);
+			}
 		}
-		else
+		catch (Exception ex)
 		{
 			notificationService.ShowNotification(
 				titulo: "Error de Búsqueda",
@@ -134,7 +150,7 @@
 		{
 			notificationService.ShowNotification(
 				titulo: "Error!",
-				mensaje: "No se pudo eliminar!",
+				mensaje: "No se puede eliminar!",
 				NotificationSeverity.Error
 			);
 			return;

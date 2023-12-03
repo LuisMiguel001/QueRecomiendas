@@ -1,0 +1,77 @@
+﻿@page "/ruleta"
+@inject HttpClient httpClient
+<style>
+    .ruleta-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    .ruleta-btn {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background-color: #3498db;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        margin-bottom: 20px;
+        transition: background-color 0.3s;
+    }
+
+        .ruleta-btn:hover {
+            background-color: #2980b9;
+        }
+
+    .pelicula-container {
+        text-align: center;
+    }
+
+    .pelicula-img {
+        width: 225px;
+        height: 315px;
+        margin-right: 20px;
+        border-radius: 10px;
+    }
+</style>
+
+<div class="ruleta-container">
+    <h3>¡Ruleta de Películas!</h3>
+    <p>Presiona el botón para seleccionar una película al azar:</p>
+
+    <button class="ruleta-btn" @onclick="SeleccionarPelicula">Seleccionar Película</button>
+
+    @if (peliculaSeleccionada != null)
+    {
+        <div class="pelicula-container">
+            <h4>Película Seleccionada:</h4>
+            <p>@peliculaSeleccionada.Titulo</p>
+            @if (peliculaSeleccionada.Imagen != null)
+            {
+                var base64 = Convert.ToBase64String(peliculaSeleccionada.Imagen);
+                var imgSrc = $"data:image/jpeg;base64,{base64}";
+                <a href="ver/@peliculaSeleccionada.PeliculaId">
+                    <img src="@imgSrc" alt="Imagen de la película" class="pelicula-img" />
+                </a>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private Peliculas peliculaSeleccionada;
+
+    private async Task SeleccionarPelicula()
+    {
+        var peliculas = await httpClient.GetFromJsonAsync<List<Peliculas>>("api/Peliculas");
+
+        if (peliculas != null && peliculas.Any())
+        {
+            var random = new Random();
+            peliculaSeleccionada = peliculas[random.Next(peliculas.Count)];
+        }
+    }
+}

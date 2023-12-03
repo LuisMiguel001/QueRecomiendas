@@ -1,0 +1,135 @@
+﻿@page "/c_usuarios"
+@inject HttpClient httpClient
+@inject NavigationManager navManager
+@inject NotificationService notificationService
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize(Roles = "Administrador")]
+
+<div class="container">
+	<div class="card shadow-lg">
+
+		@*Encabezado*@
+		<div class="card-header">
+			<h3 class="card align-items-center">Usuarios Registrados</h3>
+		</div>
+
+		<div class="card-body">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>ID</th>
+						<th>Correo</th>
+						<th>Clave</th>
+						<th>Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var usuario in Usuarios)
+					{
+						<tr>
+							<td>@usuario.UsuarioId</td>
+							<td>@usuario.Correo</td>
+							<td>@usuario.Clave</td>
+							<td>
+								<button class="btn btn-outline-danger" @onclick="() => EliminarUsuario(usuario.UsuarioId)">Eliminar</button>
+								<button class="btn btn-outline-primary" @onclick="() => EditarUsuario(usuario.UsuarioId)">Editar</button>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+
+			@if (usuario != null)
+			{
+				<h4>Editar Usuario</h4>
+				<form>
+					<div class="form-group">
+						<label for="correo">Correo:</label>
+						<input type="email" class="form-control" id="correo" @bind="usuario.Correo" />
+					</div>
+					<div class="form-group">
+						<label for="clave">Clave:</label>
+						<input type="password" class="form-control" id="clave" @bind="usuario.Clave" />
+					</div>
+
+					<br>
+
+					<button type="button" class="btn btn-outline-primary" @onclick="GuardarCambios">Guardar Cambios</button>
+
+					<button type="button" class="btn btn-outline-secondary" @onclick="CancelarEdicion">Cancelar</button>
+				</form>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	private List<Usuarios> Usuarios = new List<Usuarios>();
+	private Usuarios usuario;
+
+	protected override async Task OnInitializedAsync()
+	{
+		Usuarios = await httpClient.GetFromJsonAsync<List<Usuarios>>("/api/Usuarios");
+	}
+
+	private async void EliminarUsuario(int usuarioId)
+	{
+		var response = await httpClient.DeleteAsync($"/api/Usuarios/{usuarioId}");
+
+		if (response.IsSuccessStatusCode)
+		{
+			Usuarios = await httpClient.GetFromJsonAsync<List<Usuarios>>("/api/Usuarios");
+			StateHasChanged();
+			notificationService.ShowNotification(
+				titulo: "Excito!",
+				mensaje: "Se elimino el usuario",
+				NotificationSeverity.Success
+			);
+		}
+		else
+		{
+			notificationService.ShowNotification(
+						titulo: "Error!",
+						mensaje: "Salio algo mal al eliminar",
+						NotificationSeverity.Error
+					);
+		}
+	}
+
+	private void EditarUsuario(int usuarioId)
+	{
+		usuario = Usuarios.FirstOrDefault(u => u.UsuarioId == usuarioId);
+	}
+
+	private async void GuardarCambios()
+	{
+		usuario.Clave = BCrypt.Net.BCrypt.HashPassword(usuario.Clave);
+
+		var response = await httpClient.PutAsJsonAsync($"/api/Usuarios/{usuario.UsuarioId}", usuario);
+
+		if (response.IsSuccessStatusCode)
+		{
+			Usuarios = await httpClient.GetFromJsonAsync<List<Usuarios>>("/api/Usuarios");
+			usuario = null;
+			StateHasChanged();
+			notificationService.ShowNotification(
+						titulo: "Exito!",
+						mensaje: "Se guardaron los cambios",
+						NotificationSeverity.Success
+					);
+		}
+		else
+		{
+			notificationService.ShowNotification(
+				titulo: "Error!",
+				mensaje: "Salio algo mal al guardar los cambios",
+				NotificationSeverity.Error
+			);
+		}
+	}
+
+	private void CancelarEdicion()
+	{
+		usuario = null;
+	}
+}

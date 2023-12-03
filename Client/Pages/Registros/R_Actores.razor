@@ -124,7 +124,12 @@
 
 			if (response.IsSuccessStatusCode)
 			{
-				actor = new Actores();
+				notificationService.ShowNotification(
+					titulo: "Exito!",
+					mensaje: "Se Guardo Correctamente!",
+					NotificationSeverity.Success
+				);
+				Nuevo();
 			}
 			else
 			{
@@ -148,19 +153,30 @@
 
 	public async Task Buscar()
 	{
-		var actorEncotrado = await httpClient.GetFromJsonAsync<Actores>($"api/Actores/{actor.ActorId}");
-
-		if (actorEncotrado != null)
+		try
 		{
-			this.actor = actorEncotrado;
-			StateHasChanged();
+			var actorEncotrado = await httpClient.GetFromJsonAsync<Actores>($"api/Actores/{actor.ActorId}");
+
+			if (actorEncotrado != null)
+			{
+				this.actor = actorEncotrado;
+				StateHasChanged();
+			}
+			else
+			{
+				notificationService.ShowNotification(
+						titulo: "Error de Búsqueda",
+						mensaje: "Actor no Encontrado",
+						NotificationSeverity.Error
+				);
+			}
 		}
-		else
+		catch (Exception ex)
 		{
 			notificationService.ShowNotification(
-					titulo: "Error de Búsqueda",
-					mensaje: "Actor no Encontrado",
-					NotificationSeverity.Error
+				titulo: "Error de Búsqueda",
+				mensaje: "Actor no Encontrado",
+				NotificationSeverity.Error
 			);
 		}
 	}
@@ -178,7 +194,7 @@
 		{
 			notificationService.ShowNotification(
 				titulo: "Error!",
-				mensaje: "No se pudo eliminar!",
+				mensaje: "No se puede eliminar!",
 				NotificationSeverity.Error
 			);
 			return;

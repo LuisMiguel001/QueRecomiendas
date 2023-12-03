@@ -179,17 +179,12 @@
 			</div>
 		</div>
 	</div>
-	@if (Mensaje.Length > 0)
-	{
-		<label class="text-danger">@Mensaje</label>
-	}
 </EditForm>
 
 @code {
 	[Parameter]
 	public int PeliculaId { get; set; }
 	public Peliculas pelicula { get; set; } = new Peliculas();
-	private string Mensaje = string.Empty;
 	public PeliculasDetalle detalle { get; set; } = new PeliculasDetalle();
 	public List<Actores> actoresList { get; set; } = new List<Actores>();
 	public Actores actor { get; set; } = new Actores();
@@ -229,19 +224,30 @@
 
 	public async Task Buscar()
 	{
-		var peliculaEncotrado = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{pelicula.PeliculaId}");
-
-		if (peliculaEncotrado != null)
+		try
 		{
-			this.pelicula = peliculaEncotrado;
-			StateHasChanged();
+			var peliculaEncotrado = await httpClient.GetFromJsonAsync<Peliculas>($"api/Peliculas/{pelicula.PeliculaId}");
+
+			if (peliculaEncotrado != null)
+			{
+				this.pelicula = peliculaEncotrado;
+				StateHasChanged();
+			}
+			else
+			{
+				notificationService.ShowNotification(
+						titulo: "Error de búsqueda",
+						mensaje: "Registro no encontrado",
+						NotificationSeverity.Error
+				);
+			}
 		}
-		else
+		catch (Exception ex)
 		{
 			notificationService.ShowNotification(
-					titulo: "Error de búsqueda",
-					mensaje: "Registro no encontrado",
-					NotificationSeverity.Error
+				titulo: "Error de Búsqueda",
+				mensaje: "Película no Encontrada",
+				NotificationSeverity.Error
 			);
 		}
 	}
@@ -322,7 +328,7 @@
 		{
 			notificationService.ShowNotification(
 				titulo: "Error!",
-				mensaje: "No se pudo eliminar!",
+				mensaje: "No se puede eliminar!",
 				NotificationSeverity.Error
 			);
 			return;

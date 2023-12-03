@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Crypto.Generators;
 using QueRecomiendas.Server.DAL;
 using QueRecomiendas.Shared.Login;
+using QueRecomiendas.Shared.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -21,6 +22,65 @@ namespace QueRecomiendas.Server.Controllers
 		public UsuariosController(PeliculasContext context)
 		{
 			_context = context;
+		}
+
+		[HttpGet]
+		public async Task<ActionResult<IEnumerable<Usuarios>>> GetUsuarios()
+		{
+			return await _context.Usuarios.ToListAsync();
+		}
+
+		[HttpGet("{id}")]
+		public async Task<ActionResult<Usuarios>> ObtenerUsuarios(int id)
+		{
+			if (_context.Usuarios == null)
+			{
+				return NotFound();
+			}
+			var usuario = _context.Usuarios
+				.Where(l => l.UsuarioId == id)
+				.SingleOrDefault();
+
+			if (usuario == null)
+			{
+				return NotFound("Usuario no encontrado");
+			}
+
+			return Ok(usuario);
+		}
+
+		[HttpPut("{id}")]
+		public async Task<IActionResult> Put(int id, Usuarios usuarioActualizado)
+		{
+			var usuario = await _context.Usuarios.FindAsync(id);
+
+			if (usuario == null)
+			{
+				return NotFound("Usuario no encontrado");
+			}
+
+			usuario.Correo = usuarioActualizado.Correo;
+			usuario.Clave = usuarioActualizado.Clave;
+
+			await _context.SaveChangesAsync();
+
+			return Ok(usuario);
+		}
+
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> Delete(int id)
+		{
+			var usuario = await _context.Usuarios.FindAsync(id);
+
+			if (usuario == null)
+			{
+				return NotFound("Usuario no encontrado");
+			}
+
+			_context.Usuarios.Remove(usuario);
+			await _context.SaveChangesAsync();
+
+			return Ok("Usuario eliminado exitosamente");
 		}
 
 		[HttpPost("register")]
@@ -49,7 +109,6 @@ namespace QueRecomiendas.Server.Controllers
 
 			if (user.Correo == "luismiguel@gmail.com" && user.Clave == "luis" || user.Correo == "enelalmonte@gmail.com" && user.Clave == "enel")
 			{
-				// Usuario autenticado como administrador
 				sesionDTO.Nombre = "admin";
 				sesionDTO.Correo = user.Correo;
 				sesionDTO.Rol = "Administrador";
@@ -63,7 +122,6 @@ namespace QueRecomiendas.Server.Controllers
 					return BadRequest("Credenciales no válidas");
 				}
 
-				// Usuario autenticado como usuario normal
 				var token = GenerateJwtToken(existingUser);
 				return Ok(new { Token = token });
 			}
