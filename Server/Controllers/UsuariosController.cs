@@ -107,7 +107,7 @@ namespace QueRecomiendas.Server.Controllers
 		{
 			Sesion sesionDTO = new Sesion();
 
-			if (user.Correo == "luismiguel@gmail.com" && user.Clave == "luis" || user.Correo == "enelalmonte@gmail.com" && user.Clave == "enel")
+			if (user.Correo == "luismiguel@aplicada.com" && user.Clave == "luis" || user.Correo == "enelalmonte@aplicada.com" && user.Clave == "enel" || user.Correo == "admin@aplicada.com" && user.Clave == "admin")
 			{
 				sesionDTO.Nombre = "admin";
 				sesionDTO.Correo = user.Correo;

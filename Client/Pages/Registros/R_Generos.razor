@@ -4,7 +4,6 @@
 @using Microsoft.AspNetCore.Authorization;
 @attribute [Authorize(Roles = "Administrador")]
 
-
 <EditForm Model="genero" OnValidSubmit="GuardarGenero">
 	<DataAnnotationsValidator />
 
@@ -45,9 +44,9 @@
 							<InputTextArea id="descripcion" @bind-Value="genero.Descripcion" class="form-control" placeholder="¿Sobre qué trata el Género?" />
 						</div>
 						<ValidationMessage For="@(() => genero.Descripcion)" />
-						@if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 100)
+						@if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 50)
 						{
-							<div class="text-danger">La descripción debe tener al menos 100 palabras.</div>
+							<div class="text-danger">La descripción debe tener al menos 50 palabras.</div>
 						}
 					</div>
 				</div>
@@ -78,16 +77,7 @@
 		{
 			var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
 
-			if (!response.IsSuccessStatusCode)
-			{
-				notificationService.ShowNotification(
-					titulo: "Exito!",
-					mensaje: "Se Guardo Correctamente!",
-					NotificationSeverity.Success
-				);
-				Nuevo();
-			}
-			else
+			if (response.IsSuccessStatusCode)
 			{
 				var errorMessage = await response.Content.ReadAsStringAsync();
 				notificationService.ShowNotification(
@@ -95,6 +85,15 @@
 					mensaje: "No se pudo guardar!",
 					NotificationSeverity.Error
 				);
+			}
+			else
+			{
+				notificationService.ShowNotification(
+					titulo: "Exito!",
+					mensaje: "Se Guardo Correctamente!",
+					NotificationSeverity.Success
+				);
+				Nuevo();				
 			}
 		}
 		else
@@ -168,7 +167,7 @@
 
 	public bool Validar()
 	{
-		@if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 100)
+		@if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 50)
 		{
 			return false;
 		}

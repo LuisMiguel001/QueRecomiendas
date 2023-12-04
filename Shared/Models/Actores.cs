@@ -14,10 +14,10 @@ public class Actores
 
 	public int ActorId { get; set; }
 
-	[Required (ErrorMessage = "El Nombre es Requerido")]
+	[Required(ErrorMessage = "El Nombre es Requerido")]
 	public string Nombre { get; set; } = null!;
-		
-	[Required (ErrorMessage = "La Biografia es Requerida")]
+
+	[Required(ErrorMessage = "La Biografia es Requerida")]
 	public string? Biografia { get; set; }
 
 	[Required(ErrorMessage = "La Foto es Requerida")]

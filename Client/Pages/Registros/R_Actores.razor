@@ -60,6 +60,10 @@
 								<InputDate id="fechaNacimiento" @bind-Value="actor.FechaNacimiento" class="form-control" />
 							</div>
 							<ValidationMessage For="@(() => actor.FechaNacimiento)" />
+							@if (actor.FechaNacimiento > DateTime.Today)
+							{
+								<div class="text-danger">La fecha no puede ser superior a la de hoy</div>
+							}
 						</div>
 					</div>
 				</div>
@@ -73,9 +77,9 @@
 							<InputTextArea id="biografia" @bind-Value="actor.Biografia" class="form-control" placeholder="Biograf&iacute;a del Actor" />
 						</div>
 						<ValidationMessage For="@(() => actor.Biografia)" />
-						@if (!string.IsNullOrWhiteSpace(actor.Biografia) && ContadorPalabra(actor.Biografia) < 100)
+						@if (!string.IsNullOrWhiteSpace(actor.Biografia) && ContadorPalabra(actor.Biografia) < 50)
 						{
-							<div class="text-danger">La Biograf&iacute;a debe tener al menos 100 palabras.</div>
+							<div class="text-danger">La Biograf&iacute;a debe tener al menos 50 palabras.</div>
 						}
 					</div>
 				</div>
@@ -212,7 +216,11 @@
 
 	public bool Validar()
 	{
-		@if (!string.IsNullOrWhiteSpace(actor.Biografia) && ContadorPalabra(actor.Biografia) < 100)
+		if (!string.IsNullOrWhiteSpace(actor.Biografia) && ContadorPalabra(actor.Biografia) < 50)
+		{
+			return false;
+		}
+		if (actor.FechaNacimiento > DateTime.Today)
 		{
 			return false;
 		}

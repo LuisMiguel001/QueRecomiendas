@@ -89,9 +89,9 @@
 							<InputTextArea @bind-Value="pelicula.Resena" class="form-control"></InputTextArea>
 						</div>
 						<ValidationMessage For="@(() => pelicula.Resena)" />
-						@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 100)
+						@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) <50)
 						{
-							<div class="text-danger">El resumen debe tener al menos 100 palabras.</div>
+							<div class="text-danger">El resumen debe tener al menos 50 palabras.</div>
 						}
 					</div>
 				</div>
@@ -313,7 +313,7 @@
 
 	public bool Validar()
 	{
-		@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 100)
+		@if (!string.IsNullOrWhiteSpace(pelicula.Resena) && ContadorPalabra(pelicula.Resena) < 50)
 		{
 			return false;
 		}

@@ -11,7 +11,7 @@
 	<div class="card-body">
 		<form>
 			<div class="input-group mb-3">
-				<input type="text" @bind="FiltroTitulo" class="form-control" placeholder="Buscar por título" />
+				<input type="text" @bind="FiltroTitulo" class="form-control" placeholder="Buscar por nombre" />
 				<input type="date" @bind="FechaInicio" class="form-control">
 				<input type="date" @bind="FechaFin" class="form-control" />
 				<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
@@ -34,11 +34,13 @@
 							{
 								var base64 = Convert.ToBase64String(actor.Foto);
 								var imgSrc = $"data:image/jpeg;base64,{base64}";
-								<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 100px; height: 100px; margin-right: 5px;" />
+								<a href="veractores/@actor.ActorId">
+									<img src="@imgSrc" alt="Imagen de la película" class="img-fluid" style="width: 100px; height: 100px; margin-right: 5px;" />
+								</a>
 							}
 							<div class="align-content-center">
 								<div class="text-center">
-									<a href="veractores/@actor.ActorId" class="card-title">@actor.Nombre</a>
+									<strong style="color: black">@actor.Nombre</strong>
 								</div>
 							</div>
 						</div>
@@ -61,7 +63,6 @@
 @code {
 	public string? FiltroTitulo { get; set; }
 	public DateTime? FiltroFecha { get; set; }
-
 	public List<Actores>? Actor { get; set; }
 	public int conteo { get; set; }
 	public DateTime? FechaInicio { get; set; }
