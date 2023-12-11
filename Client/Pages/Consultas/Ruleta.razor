@@ -1,5 +1,8 @@
 ﻿@page "/ruleta"
 @inject HttpClient httpClient
+@using Microsoft.AspNetCore.Authorization;
+@attribute [Authorize]
+
 <style>
     .ruleta-container {
         display: flex;

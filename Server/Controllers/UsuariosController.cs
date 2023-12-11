@@ -101,7 +101,6 @@ namespace QueRecomiendas.Server.Controllers
 			return Ok("Registro exitoso");
 		}
 
-
 		[HttpPost("login")]
 		public async Task<IActionResult> Login(Usuarios user)
 		{
@@ -109,7 +108,7 @@ namespace QueRecomiendas.Server.Controllers
 
 			if (user.Correo == "luismiguel@aplicada.com" && user.Clave == "luis" || user.Correo == "enelalmonte@aplicada.com" && user.Clave == "enel" || user.Correo == "admin@aplicada.com" && user.Clave == "admin")
 			{
-				sesionDTO.Nombre = "admin";
+				sesionDTO.Nombre = user.Correo;
 				sesionDTO.Correo = user.Correo;
 				sesionDTO.Rol = "Administrador";
 			}

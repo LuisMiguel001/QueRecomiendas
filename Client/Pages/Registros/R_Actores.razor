@@ -83,12 +83,31 @@
 						}
 					</div>
 				</div>
-
+				<div class="modal fade show" style="display: @(mostrarConfirmacionEliminar ? "block" : "none")" tabindex="-1" role="dialog">
+					<div class="modal-dialog modal-dialog-centered" role="document">
+						<div class="modal-content" style="border: 3px solid black; background-color: #CC0000; color: yellow;">
+							<div class="modal-header">
+								<h5 class="modal-title text-center mx-auto"><i class="fas fa-exclamation-triangle text-warning"></i>⚠️Advertencia⚠️</h5>
+								<button type="button" @onclick="CerrarConfirmacionEliminar" class="close" data-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">&times;</span>
+								</button>
+							</div>
+							<div class="modal-body text-center">
+								<h4 style="font-size: 18px; color: yellow">¿Está seguro de que desea eliminar la película?</h4>
+								<h4 style="font-size: 16px; color: yellow;">Esta acción no se puede deshacer.</h4>
+							</div>
+							<div class="modal-footer justify-content-center">
+								<button type="button" class="btn btn-warning" @onclick="CerrarConfirmacionEliminar" style="background-color: grey; border-color: black; color: #fff;" data-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+								<button type="button" class="btn btn-outline-danger" @onclick="Eliminar" style="background-color: #ff0000; border-color: black; color: #fff;"><i class="fas fa-trash-alt"></i> Eliminar</button>
+							</div>
+						</div>
+					</div>
+				</div>
 				<div class="card-footer d-flex justify-content-center">
 					<div class="btn-group" role="group">
 						<button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo</button>
 						<button type="submit" class="btn btn-outline-success"> <i class="oi oi-document" /> Guardar</button>
-						<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><i class="io io-trash" /> Eliminar</button>
+						<button type="button" class="btn btn-outline-danger" @onclick="MostrarConfirmacionEliminar"><i class="io io-trash" /> Eliminar</button>
 					</div>
 				</div>
 			</div>
@@ -99,8 +118,8 @@
 @code {
 	[Parameter]
 	public int ActorId { get; set; }
-
 	private Actores actor = new Actores();
+	private bool mostrarConfirmacionEliminar = false;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -212,6 +231,16 @@
 				NotificationSeverity.Success
 			);
 		}
+	}
+
+	public void MostrarConfirmacionEliminar()
+	{
+		mostrarConfirmacionEliminar = true;
+	}
+
+	public void CerrarConfirmacionEliminar()
+	{
+		mostrarConfirmacionEliminar = false;
 	}
 
 	public bool Validar()

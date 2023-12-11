@@ -14,6 +14,7 @@ public class Generos
 	public int GeneroId { get; set; }
 
 	[Required(ErrorMessage = "El campo {0} es requerido")]
+	[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Este campo no acepta digitos")]
 	public string Categoria { get; set; } = null!;
 
 	[Required(ErrorMessage = "El campo {0} es requerido")]

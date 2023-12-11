@@ -14,6 +14,20 @@
 		</div>
 
 		<div class="card-body">
+			@*Buscar*@
+			<div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
+				<div class="input-group mb-3">
+					<span class="input-group-text">Buscar</span>
+					<InputNumber @bind-Value="usuarioIdBusqueda" class="form-control" aria-describedby="buscarButton" Min="0" />
+					<button @onclick="BuscarPorId" class="btn btn-outline-primary" type="button" id="buscarButton">
+						<i class="oi oi-magnifying-glass" />
+					</button>
+					<button @onclick="LimpiarBusqueda" class="btn btn-outline-secondary" type="button">
+						<i class="oi oi-trash" />
+					</button>
+				</div>
+			</div>
+
 			<table class="table">
 				<thead>
 					<tr>
@@ -31,7 +45,7 @@
 							<td>@usuario.Correo</td>
 							<td>@usuario.Clave</td>
 							<td>
-								<button class="btn btn-outline-danger" @onclick="() => EliminarUsuario(usuario.UsuarioId)">Eliminar</button>
+								<button class="btn btn-outline-danger" @onclick="() => ConfirmarEliminarUsuario(usuario.UsuarioId)">Eliminar</button>
 								<button class="btn btn-outline-primary" @onclick="() => EditarUsuario(usuario.UsuarioId)">Editar</button>
 							</td>
 						</tr>
@@ -63,36 +77,73 @@
 	</div>
 </div>
 
+<div class="modal fade show" style="display: @(mostrarConfirmacionEliminar ? "block" : "none")" tabindex="-1" role="dialog">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content" style="border: 3px solid black; background-color: #CC0000; color: yellow;">
+			<div class="modal-header">
+				<h5 class="modal-title text-center mx-auto"><i class="fas fa-exclamation-triangle text-warning"></i>⚠️Advertencia⚠️</h5>
+				<button type="button" @onclick="CancelarEliminarUsuario" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body text-center">
+				<h4 style="font-size: 18px; color: yellow">¿Está seguro de que desea eliminar la película?</h4>
+				<h4 style="font-size: 16px; color: yellow;">Esta acción no se puede deshacer.</h4>
+			</div>
+			<div class="modal-footer justify-content-center">
+				<button type="button" class="btn btn-warning" @onclick="CancelarEliminarUsuario" style="background-color: grey; border-color: black; color: #fff;" data-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+				<button type="button" class="btn btn-outline-danger" @onclick="EliminarUsuarioConfirmado" style="background-color: #ff0000; border-color: black; color: #fff;"><i class="fas fa-trash-alt"></i> Eliminar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 @code {
 	private List<Usuarios> Usuarios = new List<Usuarios>();
 	private Usuarios usuario;
+	private int usuarioIdBusqueda;
+	private bool mostrarConfirmacionEliminar = false;
+	private int usuarioIdAEliminar;
 
 	protected override async Task OnInitializedAsync()
 	{
 		Usuarios = await httpClient.GetFromJsonAsync<List<Usuarios>>("/api/Usuarios");
 	}
 
-	private async void EliminarUsuario(int usuarioId)
+	private void ConfirmarEliminarUsuario(int usuarioId)
 	{
-		var response = await httpClient.DeleteAsync($"/api/Usuarios/{usuarioId}");
+		mostrarConfirmacionEliminar = true;
+		usuarioIdAEliminar = usuarioId;
+	}
+
+	private void CancelarEliminarUsuario()
+	{
+		mostrarConfirmacionEliminar = false;
+		usuarioIdAEliminar = 0;
+	}
+
+	private async void EliminarUsuarioConfirmado()
+	{
+		var response = await httpClient.DeleteAsync($"/api/Usuarios/{usuarioIdAEliminar}");
 
 		if (response.IsSuccessStatusCode)
 		{
 			Usuarios = await httpClient.GetFromJsonAsync<List<Usuarios>>("/api/Usuarios");
+			mostrarConfirmacionEliminar = false;
 			StateHasChanged();
 			notificationService.ShowNotification(
-				titulo: "Excito!",
-				mensaje: "Se elimino el usuario",
+				titulo: "Éxito!",
+				mensaje: "Se eliminó el usuario",
 				NotificationSeverity.Success
 			);
 		}
 		else
 		{
 			notificationService.ShowNotification(
-						titulo: "Error!",
-						mensaje: "Salio algo mal al eliminar",
-						NotificationSeverity.Error
-					);
+				titulo: "Error!",
+				mensaje: "Algo salió mal al eliminar",
+				NotificationSeverity.Error
+			);
 		}
 	}
 
@@ -126,6 +177,47 @@
 				NotificationSeverity.Error
 			);
 		}
+	}
+
+	private async void BuscarPorId()
+	{
+		try
+		{
+			var usuarioEncontrado = Usuarios.FirstOrDefault(u => u.UsuarioId == usuarioIdBusqueda);
+
+			if (usuarioEncontrado != null)
+			{
+				Usuarios = new List<Usuarios> { usuarioEncontrado };
+				StateHasChanged();
+			}
+			else
+			{
+				notificationService.ShowNotification(
+					titulo: "Error de búsqueda",
+					mensaje: "Usuario no encontrado",
+					NotificationSeverity.Warning
+				);
+			}
+		}
+		catch (Exception ex)
+		{
+			notificationService.ShowNotification(
+				titulo: "Error de Búsqueda",
+				mensaje: "Usuario no Encontrado",
+				NotificationSeverity.Warning
+			);
+		}
+	}
+
+	private async Task ActualizarListaUsuarios()
+	{
+		Usuarios = await httpClient.GetFromJsonAsync<List<Usuarios>>("/api/Usuarios");
+	}
+
+	private void LimpiarBusqueda()
+	{
+		usuarioIdBusqueda = 0;
+		ActualizarListaUsuarios();
 	}
 
 	private void CancelarEdicion()

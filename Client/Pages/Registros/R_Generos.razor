@@ -5,172 +5,204 @@
 @attribute [Authorize(Roles = "Administrador")]
 
 <EditForm Model="genero" OnValidSubmit="GuardarGenero">
-	<DataAnnotationsValidator />
+    <DataAnnotationsValidator />
 
-	<div class="container">
-		<div class="card shadow-lg">
+    <div class="container">
+        <div class="card shadow-lg">
 
-			@*Encabezado*@
-			<div class="card-header">
-				<h3 class="card align-items-center">Registrar G&eacute;neros</h3>
-			</div>
+            @*Encabezado*@
+            <div class="card-header">
+                <h3 class="card align-items-center">Registrar G&eacute;neros</h3>
+            </div>
 
-			<div class="card-body">
-				@*Buscar*@
-				<div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
-					<div class="input-group mb-3">
-						<span class="input-group-text">Buscar</span>
-						<InputNumber @bind-Value="genero.GeneroId" class="form-control" aria-describedby="buscarButton" Min="0" />
-						<button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
-							<i class="oi oi-magnifying-glass" />
-						</button>
-					</div>
-				</div>
+            <div class="card-body">
+                @*Buscar*@
+                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 col-xl-4">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">Buscar</span>
+                        <InputNumber @bind-Value="genero.GeneroId" class="form-control" aria-describedby="buscarButton" Min="0" />
+                        <button @onclick="Buscar" class="btn btn-outline-primary" type="button" id="buscarButton">
+                            <i class="oi oi-magnifying-glass" />
+                        </button>
+                    </div>
+                </div>
 
-				<div class="mb-3">
-					<div Class="form-group">
-						<div class="input-group">
-							<span class="input-group-text">G&eacute;nero</span>
-							<InputText id="categoria" @bind-Value="genero.Categoria" class="form-control" placeholder="Nombre del G&eacute;nero" />
-						</div>
-						<ValidationMessage For="@(() => genero.Categoria)" />
-					</div>
-				</div>
+                <div class="mb-3">
+                    <div Class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">G&eacute;nero</span>
+                            <InputText id="categoria" @bind-Value="genero.Categoria" class="form-control" placeholder="Nombre del G&eacute;nero" />
+                        </div>
+                        <ValidationMessage For="@(() => genero.Categoria)" />
+                    </div>
+                </div>
 
-				<div class="mb-3">
-					<div Class="form-group">
-						<div class="input-group">
-							<span class="input-group-text">Descripci&oacute;n</span>
-							<InputTextArea id="descripcion" @bind-Value="genero.Descripcion" class="form-control" placeholder="¿Sobre qué trata el Género?" />
-						</div>
-						<ValidationMessage For="@(() => genero.Descripcion)" />
-						@if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 50)
-						{
-							<div class="text-danger">La descripción debe tener al menos 50 palabras.</div>
-						}
-					</div>
-				</div>
-			</div>
-			<div class="card-footer d-flex justify-content-center">
-				<div class="btn-group" role="group">
-					<button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo</button>
-					<button type="submit" class="btn btn-outline-success"> <i class="oi oi-document" /> Guardar</button>
-					<button type="button" class="btn btn-outline-danger" @onclick="Eliminar"><i class="io io-trash" /> Eliminar</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div class="mb-3">
+                    <div Class="form-group">
+                        <div class="input-group">
+                            <span class="input-group-text">Descripci&oacute;n</span>
+                            <InputTextArea id="descripcion" @bind-Value="genero.Descripcion" class="form-control" placeholder="¿Sobre qué trata el Género?" />
+                        </div>
+                        <ValidationMessage For="@(() => genero.Descripcion)" />
+                        @if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 50)
+                        {
+                            <div class="text-danger">La descripción debe tener al menos 50 palabras.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade show" style="display: @(mostrarConfirmacionEliminar ? "block" : "none")" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content" style="border: 3px solid black; background-color: #CC0000; color: yellow;">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-center mx-auto"><i class="fas fa-exclamation-triangle text-warning"></i>⚠️Advertencia⚠️</h5>
+                            <button type="button" @onclick="OcultarConfirmacionEliminar" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <h4 style="font-size: 18px; color: yellow">¿Está seguro de que desea eliminar la película?</h4>
+                            <h4 style="font-size: 16px; color: yellow;">Esta acción no se puede deshacer.</h4>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <button type="button" class="btn btn-warning" @onclick="OcultarConfirmacionEliminar" style="background-color: grey; border-color: black; color: #fff;" data-dismiss="modal"><i class="fas fa-times"></i> Cancelar</button>
+                            <button type="button" class="btn btn-outline-danger" @onclick="Eliminar" style="background-color: #ff0000; border-color: black; color: #fff;"><i class="fas fa-trash-alt"></i> Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-center">
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-primary" @onclick="Nuevo"> <i class="oi oi-file" /> Nuevo</button>
+                    <button type="submit" class="btn btn-outline-success"> <i class="oi oi-document" /> Guardar</button>
+                    <button type="button" class="btn btn-outline-danger" @onclick="MostrarConfirmacionEliminar"><i class="io io-trash" /> Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </EditForm>
 
 @code {
-	private Generos genero = new Generos();
+    private Generos genero = new Generos();
+    private bool mostrarConfirmacionEliminar = false;
 
-	private int ContadorPalabra(string text)
-	{
-		var Contandor = text.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
-		return Contandor;
-	}
+    private int ContadorPalabra(string text)
+    {
+        var Contandor = text.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+        return Contandor;
+    }
 
-	private async Task GuardarGenero()
-	{
-		if (Validar())
-		{
-			var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
+    private async Task GuardarGenero()
+    {
+        if (Validar())
+        {
+            var response = await httpClient.PostAsJsonAsync("api/Generos", genero);
 
-			if (response.IsSuccessStatusCode)
-			{
-				var errorMessage = await response.Content.ReadAsStringAsync();
-				notificationService.ShowNotification(
-					titulo: "Error!",
-					mensaje: "No se pudo guardar!",
-					NotificationSeverity.Error
-				);
-			}
-			else
-			{
-				notificationService.ShowNotification(
-					titulo: "Exito!",
-					mensaje: "Se Guardo Correctamente!",
-					NotificationSeverity.Success
-				);
-				Nuevo();				
-			}
-		}
-		else
-		{
-			notificationService.ShowNotification(
-					titulo: "Verificar!",
-					mensaje: "Algo salio mal al guardar",
-					NotificationSeverity.Error
-				);
-		}
-	}
+            if (response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                notificationService.ShowNotification(
+                    titulo: "Error!",
+                    mensaje: "No se pudo guardar!",
+                    NotificationSeverity.Error
+                );
+            }
+            else
+            {
+                notificationService.ShowNotification(
+                    titulo: "Exito!",
+                    mensaje: "Se Guardo Correctamente!",
+                    NotificationSeverity.Success
+                );
+                Nuevo();
+            }
+        }
+        else
+        {
+            notificationService.ShowNotification(
+                    titulo: "Verificar!",
+                    mensaje: "Algo salio mal al guardar",
+                    NotificationSeverity.Error
+                );
+        }
+    }
 
-	public async Task Buscar()
-	{
-		try
-		{
-			var generoEncontrado = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{genero.GeneroId}");
+    public async Task Buscar()
+    {
+        try
+        {
+            var generoEncontrado = await httpClient.GetFromJsonAsync<Generos>($"api/Generos/{genero.GeneroId}");
 
-			if (generoEncontrado != null)
-			{
-				this.genero = generoEncontrado;
-				StateHasChanged();
-			}
-			else
-			{
-				notificationService.ShowNotification(
-					titulo: "Error de Búsqueda",
-					mensaje: "Género no Encontrado",
-					NotificationSeverity.Error
-				);
-			}
-		}
-		catch (Exception ex)
-		{
-			notificationService.ShowNotification(
-				titulo: "Error de Búsqueda",
-				mensaje: "Género no Encontrado",
-				NotificationSeverity.Error
-			);
-		}
-	}
+            if (generoEncontrado != null)
+            {
+                this.genero = generoEncontrado;
+                StateHasChanged();
+            }
+            else
+            {
+                notificationService.ShowNotification(
+                    titulo: "Error de Búsqueda",
+                    mensaje: "Género no Encontrado",
+                    NotificationSeverity.Error
+                );
+            }
+        }
+        catch (Exception ex)
+        {
+            notificationService.ShowNotification(
+                titulo: "Error de Búsqueda",
+                mensaje: "Género no Encontrado",
+                NotificationSeverity.Error
+            );
+        }
+    }
 
-	public void Nuevo()
-	{
-		this.genero = new Generos();
-	}
+    public void Nuevo()
+    {
+        this.genero = new Generos();
+    }
 
-	public async Task Eliminar()
-	{
-		using var response = await httpClient.DeleteAsync($"api/Generos/{genero.GeneroId}");
+    public void MostrarConfirmacionEliminar()
+    {
+        mostrarConfirmacionEliminar = true;
+    }
 
-		if (!response.IsSuccessStatusCode)
-		{
-			notificationService.ShowNotification(
-				titulo: "Error!",
-				mensaje: "No se puede eliminar!",
-				NotificationSeverity.Error
-			);
-			return;
-		}
-		else
-		{
-			Nuevo();
-			notificationService.ShowNotification(
-				titulo: "Eliminado",
-				mensaje: "Se ha eliminado Correctamente",
-				NotificationSeverity.Success
-			);
-		}
-	}
+    public void OcultarConfirmacionEliminar()
+    {
+        mostrarConfirmacionEliminar = false;
+    }
 
-	public bool Validar()
-	{
-		@if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 50)
-		{
-			return false;
-		}
-		return true;
-	}
+    public async Task Eliminar()
+    {
+        using var response = await httpClient.DeleteAsync($"api/Generos/{genero.GeneroId}");
+
+        if (!response.IsSuccessStatusCode)
+        {
+            notificationService.ShowNotification(
+                titulo: "Error!",
+                mensaje: "No se puede eliminar!",
+                NotificationSeverity.Error
+            );
+            return;
+        }
+        else
+        {
+            Nuevo();
+            notificationService.ShowNotification(
+                titulo: "Eliminado",
+                mensaje: "Se ha eliminado Correctamente",
+                NotificationSeverity.Success
+            );
+            OcultarConfirmacionEliminar();
+        }
+    }
+
+    public bool Validar()
+    {
+        @if (!string.IsNullOrWhiteSpace(genero.Descripcion) && ContadorPalabra(genero.Descripcion) < 50)
+        {
+            return false;
+        }
+        return true;
+    }
 }

@@ -15,6 +15,7 @@ public class Actores
 	public int ActorId { get; set; }
 
 	[Required(ErrorMessage = "El Nombre es Requerido")]
+	[RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Este campo no acepta digitos")]
 	public string Nombre { get; set; } = null!;
 
 	[Required(ErrorMessage = "La Biografia es Requerida")]
