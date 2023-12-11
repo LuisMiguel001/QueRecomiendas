@@ -1,9 +1,12 @@
 **
 Proyecto Final AP1 (Luis Miguel Jerez Caceres).
 **
+
 **
 Nombre de la App: PeliWorld
 **
+
+**Link de Youtube:** https://www.youtube.com/watch?v=ZFHB0Mk3UGU
 
 **Pantalla:** Login
 
@@ -17,10 +20,12 @@ Nombre de la App: PeliWorld
 
 **Estas son las credenciales de un usuario Administrador,  si deseas entrar como un usuario normal solo registra tus credenciales en la parte de [registrarse](http://reg "registrarse").**
 
-**CREDENCIALES ADMIN:
-Correo: admin@aplicada.com
-Clave: admin
-**
+**CREDENCIALES ADMIN:**
+
+**Correo:** admin@aplicada.com
+
+**Clave: **admin
+
 
 **Pantalla:** Movies
 
@@ -66,7 +71,14 @@ Clave: admin
 
 ![](https://i.postimg.cc/FsqXv5MW/R-peliculas.png)
 
+![](https://i.postimg.cc/pr096GCp/Imagen5.png)
+
+**El Detalle Antes:**
 ![](https://i.postimg.cc/N0Wm1Mrh/detalle.png)
+**El Detalle Ahora:**
+![](https://i.postimg.cc/bwNq7np7/Imagen3.png)
+
+![](https://i.postimg.cc/nr3nrV1R/Imagen2.png)
 
 **Pantalla:** Registrar Actores
 
