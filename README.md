@@ -16,7 +16,7 @@ Nombre de la App: PeliWorld
 
 **Pantalla:** Registro de Usuarios
 
-![](https://i.postimg.cc/qBmCQP41/regitro.png)
+![](https://i.postimg.cc/gJp5RQ7y/regitro.png)
 
 **Estas son las credenciales de un usuario Administrador,  si deseas entrar como un usuario normal solo registra tus credenciales en la parte de [registrarse](http://reg "registrarse").**
 
